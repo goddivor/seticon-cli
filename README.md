@@ -1,9 +1,17 @@
+<div align="center">
+
 # seticon
+
+[![npm version](https://img.shields.io/npm/v/seticon-cli.svg)](https://www.npmjs.com/package/seticon-cli)
+[![license](https://img.shields.io/npm/l/seticon-cli.svg)](./LICENSE)
+[![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](./.github/CODE_OF_CONDUCT.md)
 
 Cross-platform CLI to change folder icons on **Windows**, **macOS** and **Linux**.
 
 Automatically converts PNG icons to multi-size ICO on Windows, and uses the
 right mechanism for each desktop environment elsewhere.
+
+</div>
 
 ## Features
 
@@ -16,19 +24,34 @@ right mechanism for each desktop environment elsewhere.
   - macOS   → `NSWorkspace.setIcon` via `osascript` (Finder)
   - Linux   → `gio set metadata::custom-icon` (GNOME) + `.directory` (KDE)
 
+## Requirements
+
+- Node.js >= 18.17.0
+- Windows: works out of the box
+- macOS: Finder automation permission (prompted on first run)
+- Linux: `gio` (part of `glib2`, present by default on most distros)
+
 ## Installation
 
 ```bash
-npm install -g seticon
+npm i seticon-cli
 ```
 
-Node.js **18.17+** is required.
+Or install it globally to use the `seticon` command anywhere:
+
+```bash
+npm i -g seticon-cli
+```
 
 ## Usage
 
 ```bash
 # Set a folder icon (auto-converts PNG → ICO on Windows)
 seticon set -f "./MyFolder" -i "./icon.png"
+
+# Shorthand: positional arguments, no flags needed
+seticon "./MyFolder" "./icon.png"
+seticon convert "./image.png" "./icon.ico"
 
 # Long options also work
 seticon set --folder "Documents" --icon "logo.ico"
@@ -50,45 +73,3 @@ seticon --help
 | Windows | `.ico` (PNG auto-converted)    | `desktop.ini` written + folder marked system/hidden  |
 | macOS   | `.png` / `.jpg` / `.tiff` / `.icns` | Asks for Finder automation permission on first run |
 | Linux   | `.png` / `.jpg` / `.svg` / `.ico` | GNOME via `gio`, KDE via `.directory`              |
-
-## How it works
-
-### Windows
-Writes a `desktop.ini` file inside the target folder:
-
-```ini
-[.ShellClassInfo]
-IconResource=path\to\icon.ico,0
-```
-
-Then applies `+H +S` to the `desktop.ini` and `+R` to the folder so Explorer
-picks up the icon.
-
-### macOS
-Calls `NSWorkspace.sharedWorkspace.setIcon_forFile_options_` via JXA
-(`osascript -l JavaScript`). The first run will ask for Finder automation
-permission.
-
-### Linux
-- **GNOME / Nautilus**: `gio set "<folder>" metadata::custom-icon "file://<icon>"`
-- **KDE / Dolphin**: writes a `.directory` file with `Icon=<absolute path>`
-
-Both are applied so the icon shows up regardless of the file manager.
-You may need to refresh the file manager (F5) to see the change.
-
-## Requirements
-
-- Node.js >= 18.17.0
-- Windows: works out of the box
-- macOS: Finder automation permission (prompted on first run)
-- Linux: `gio` (part of `glib2`, present by default on most distros)
-
-## License
-
-MIT © Divor
-
-## Links
-
-- [Repository](https://github.com/goddivor/seticon-cli)
-- [Issues](https://github.com/goddivor/seticon-cli/issues)
-- [npm package](https://www.npmjs.com/package/seticon-cli)
