@@ -1,32 +1,14 @@
 ---
 name: Feature request
-about: Suggest an idea or improvement for seticon-cli
+about: Suggest an idea
 title: "[Feature]: "
 labels: enhancement
-assignees: ""
 ---
 
-## Problem
+## What would you like?
 
-Is your feature request related to a problem? A clear description of what the
-problem is. Ex: "I'm always frustrated when [...]"
+Describe the feature or improvement, and the problem it solves.
 
-## Proposed solution
+## Anything else?
 
-A clear and concise description of what you want to happen.
-
-## Platforms affected
-
-- [ ] Windows
-- [ ] macOS
-- [ ] Linux (GNOME family)
-- [ ] Linux (KDE family)
-- [ ] All / platform-agnostic
-
-## Alternatives considered
-
-Any alternative solutions or features you've considered.
-
-## Additional context
-
-Add any other context, mockups, or references about the feature request here.
+Alternatives you considered, which platforms it concerns, etc.

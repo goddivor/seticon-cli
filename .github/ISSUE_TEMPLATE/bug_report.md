@@ -1,46 +1,26 @@
 ---
 name: Bug report
-about: Report a problem with seticon-cli
+about: Something isn't working
 title: "[Bug]: "
 labels: bug
-assignees: ""
 ---
 
-## Description
+## What happened?
 
-A clear and concise description of what the bug is.
+Describe the bug and what you expected instead.
 
-## Steps to reproduce
+## How to reproduce
 
-1. Run `seticon ...`
-2. With folder `...` and icon `...`
-3. See error
+The command you ran, the folder and the icon file involved.
 
-## Expected behavior
-
-What you expected to happen.
-
-## Actual behavior
-
-What actually happened. Paste the full terminal output if relevant.
+## Output
 
 ```text
-<paste output here>
+<paste the terminal output here>
 ```
 
 ## Environment
 
-- **OS**: <!-- Windows 11 / macOS 14 / Ubuntu 24.04 (GNOME, KDE, ...) -->
-- **Desktop environment (Linux only)**: <!-- GNOME / KDE / XFCE / unknown -->
-- **Node.js version**: <!-- output of `node --version` -->
-- **seticon-cli version**: <!-- output of `npm ls -g seticon-cli` or the value in package.json -->
-- **Install method**: <!-- npm install -g seticon-cli / local clone -->
-
-## Icon file
-
-- **Format**: <!-- .png / .ico / .svg / .icns / ... -->
-- **Source**: <!-- attach the icon or describe it -->
-
-## Additional context
-
-Add any other context, screenshots, or notes about the problem here.
+- OS (and desktop environment on Linux):
+- Node.js version (`node --version`):
+- seticon-cli version:
