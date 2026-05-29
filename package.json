@@ -1,6 +1,6 @@
 {
   "name": "seticon-cli",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Cross-platform CLI to change folder icons on Windows, macOS and Linux, with automatic PNG to ICO conversion on Windows",
   "main": "seticon.js",
   "type": "module",
