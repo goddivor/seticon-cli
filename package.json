@@ -1,0 +1,55 @@
+{
+  "name": "seticon-cli",
+  "version": "1.0.0",
+  "description": "Cross-platform CLI to change folder icons on Windows, macOS and Linux, with automatic PNG to ICO conversion on Windows",
+  "main": "seticon.js",
+  "type": "module",
+  "bin": {
+    "seticon": "seticon.js"
+  },
+  "files": [
+    "seticon.js",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "start": "node seticon.js"
+  },
+  "keywords": [
+    "icon",
+    "folder",
+    "folder-icon",
+    "cli",
+    "ico",
+    "png-to-ico",
+    "cross-platform",
+    "windows",
+    "macos",
+    "linux",
+    "gnome",
+    "kde",
+    "desktop-ini"
+  ],
+  "author": "Divor <todjropatrice2002@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/goddivor/seticon.git"
+  },
+  "bugs": {
+    "url": "https://github.com/goddivor/seticon/issues"
+  },
+  "homepage": "https://github.com/goddivor/seticon#readme",
+  "engines": {
+    "node": ">=18.17.0"
+  },
+  "os": [
+    "win32",
+    "darwin",
+    "linux"
+  ],
+  "dependencies": {
+    "png-to-ico": "^3.0.1",
+    "sharp": "^0.34.5"
+  }
+}
