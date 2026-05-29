@@ -2,9 +2,13 @@
 
 # seticon
 
-[![npm version](https://img.shields.io/npm/v/seticon-cli.svg)](https://www.npmjs.com/package/seticon-cli)
+[![Release](https://img.shields.io/github/v/release/goddivor/seticon-cli?logo=github&label=Release)](https://github.com/goddivor/seticon-cli/releases)
 [![license](https://img.shields.io/npm/l/seticon-cli.svg)](./LICENSE)
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](./.github/CODE_OF_CONDUCT.md)
+
+[![Downloads](https://img.shields.io/npm/dy/seticon-cli?logo=npm&label=Downloads)](https://www.npmjs.com/package/seticon-cli)
+[![Stars](https://img.shields.io/github/stars/goddivor/seticon-cli?logo=github&label=Stars)](https://github.com/goddivor/seticon-cli/stargazers)
+[![Forks](https://img.shields.io/github/forks/goddivor/seticon-cli?logo=github&label=Forks)](https://github.com/goddivor/seticon-cli/network/members)
 
 Cross-platform CLI to change folder icons on **Windows**, **macOS** and **Linux**.
 
@@ -64,6 +68,10 @@ seticon convert --icon "photo.png" --output "icon.ico" --sizes 16,32,48
 
 # Show the full manual
 seticon --help
+
+# Switch the interface language, remembered for next runs (en, fr)
+seticon --lang fr
+seticon -l en
 ```
 
 ### Supported icon formats per OS
