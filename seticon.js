@@ -103,7 +103,6 @@ FolderType=Generic
     }
 
     setFolderIconMacOS(folderPath, iconPath) {
-        // Use Cocoa's NSWorkspace.setIcon via JXA (JavaScript for Automation)
         const script = `ObjC.import('Cocoa');
 var image = $.NSImage.alloc.initWithContentsOfFile(${JSON.stringify(iconPath)});
 if (image.isNil()) { throw new Error('Failed to load icon: invalid image file'); }
@@ -124,7 +123,6 @@ if (!success) { throw new Error('NSWorkspace returned false (try granting automa
     setFolderIconLinux(folderPath, iconPath) {
         const applied = [];
 
-        // 1. GNOME / Nautilus / Cinnamon / MATE → gio metadata
         try {
             execSync(
                 `gio set ${JSON.stringify(folderPath)} metadata::custom-icon ${JSON.stringify(`file://${iconPath}`)}`,
@@ -132,16 +130,13 @@ if (!success) { throw new Error('NSWorkspace returned false (try granting automa
             );
             applied.push('gio metadata (GNOME family)');
         } catch {
-            // gio not available, skip
         }
 
-        // 2. KDE / Plasma / LXDE / LXQt → .directory file
         try {
             const dotDirectory = path.join(folderPath, '.directory');
             fs.writeFileSync(dotDirectory, `[Desktop Entry]\nIcon=${iconPath}\n`);
             applied.push('.directory file (KDE family)');
         } catch (e) {
-            // continue, gio might have worked
         }
 
         if (applied.length === 0) {
@@ -270,7 +265,6 @@ ${'='.repeat(34)}
                 });
             }
         } catch (error) {
-            // Ignore cleanup errors
         }
     }
 }
