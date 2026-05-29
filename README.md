@@ -5,8 +5,8 @@
 [![Release](https://img.shields.io/github/v/release/goddivor/seticon-cli?logo=github&label=Release)](https://github.com/goddivor/seticon-cli/releases)
 [![license](https://img.shields.io/npm/l/seticon-cli.svg)](./LICENSE)
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](./.github/CODE_OF_CONDUCT.md)
-
 [![Downloads](https://img.shields.io/npm/dy/seticon-cli?logo=npm&label=Downloads)](https://www.npmjs.com/package/seticon-cli)
+
 [![Stars](https://img.shields.io/github/stars/goddivor/seticon-cli?logo=github&label=Stars)](https://github.com/goddivor/seticon-cli/stargazers)
 [![Forks](https://img.shields.io/github/forks/goddivor/seticon-cli?logo=github&label=Forks)](https://github.com/goddivor/seticon-cli/network/members)
 [![Watchers](https://img.shields.io/github/watchers/goddivor/seticon-cli?logo=github&label=Watchers)](https://github.com/goddivor/seticon-cli/watchers)
