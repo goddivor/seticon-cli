@@ -9,6 +9,9 @@
 [![Downloads](https://img.shields.io/npm/dy/seticon-cli?logo=npm&label=Downloads)](https://www.npmjs.com/package/seticon-cli)
 [![Stars](https://img.shields.io/github/stars/goddivor/seticon-cli?logo=github&label=Stars)](https://github.com/goddivor/seticon-cli/stargazers)
 [![Forks](https://img.shields.io/github/forks/goddivor/seticon-cli?logo=github&label=Forks)](https://github.com/goddivor/seticon-cli/network/members)
+[![Watchers](https://img.shields.io/github/watchers/goddivor/seticon-cli?logo=github&label=Watchers)](https://github.com/goddivor/seticon-cli/watchers)
+[![Contributors](https://img.shields.io/github/contributors/goddivor/seticon-cli?logo=github&label=Contributors)](https://github.com/goddivor/seticon-cli/graphs/contributors)
+[![Open issues](https://img.shields.io/github/issues/goddivor/seticon-cli?logo=github&label=Issues)](https://github.com/goddivor/seticon-cli/issues)
 
 Cross-platform CLI to change folder icons on **Windows**, **macOS** and **Linux**.
 
