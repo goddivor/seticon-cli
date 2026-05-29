@@ -22,3 +22,6 @@ Thumbs.db
 # Local env
 .env
 .env.local
+
+# Claude Code project context (local only, not published)
+CLAUDE.md
