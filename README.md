@@ -89,6 +89,6 @@ MIT © Divor
 
 ## Links
 
-- [Repository](https://github.com/goddivor/seticon)
-- [Issues](https://github.com/goddivor/seticon/issues)
+- [Repository](https://github.com/goddivor/seticon-cli)
+- [Issues](https://github.com/goddivor/seticon-cli/issues)
 - [npm package](https://www.npmjs.com/package/seticon-cli)

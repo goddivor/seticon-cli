@@ -34,12 +34,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/goddivor/seticon.git"
+    "url": "git+https://github.com/goddivor/seticon-cli.git"
   },
   "bugs": {
-    "url": "https://github.com/goddivor/seticon/issues"
+    "url": "https://github.com/goddivor/seticon-cli/issues"
   },
-  "homepage": "https://github.com/goddivor/seticon#readme",
+  "homepage": "https://github.com/goddivor/seticon-cli#readme",
   "engines": {
     "node": ">=18.17.0"
   },
