@@ -1,12 +1,50 @@
 #!/usr/bin/env node
 
 import fs from 'fs';
+import os from 'os';
 import path from 'path';
 import { execSync } from 'child_process';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+const SUPPORTED_LANGUAGES = ['en', 'fr'];
+
+function getVersion() {
+    try {
+        const pkg = JSON.parse(fs.readFileSync(path.join(__dirname, 'package.json'), 'utf8'));
+        return pkg.version;
+    } catch {
+        return 'unknown';
+    }
+}
+
+function getConfigPath() {
+    const base = process.platform === 'win32'
+        ? (process.env.APPDATA || path.join(os.homedir(), 'AppData', 'Roaming'))
+        : (process.env.XDG_CONFIG_HOME || path.join(os.homedir(), '.config'));
+    return path.join(base, 'seticon', 'config.json');
+}
+
+function loadConfig() {
+    try {
+        return JSON.parse(fs.readFileSync(getConfigPath(), 'utf8'));
+    } catch {
+        return {};
+    }
+}
+
+function saveConfig(config) {
+    const configPath = getConfigPath();
+    fs.mkdirSync(path.dirname(configPath), { recursive: true });
+    fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
+}
+
+function getLanguage() {
+    const lang = loadConfig().lang;
+    return SUPPORTED_LANGUAGES.includes(lang) ? lang : 'en';
+}
 
 class FolderIconCLI {
     constructor() {
@@ -178,8 +216,86 @@ if (!success) { throw new Error('NSWorkspace returned false (try granting automa
         }
     }
 
-    showHelp() {
-        console.log(`
+    showHelp(lang = getLanguage()) {
+        const version = getVersion();
+        const help = {
+            en: `
+📁 SETICON - User manual
+${'='.repeat(34)}
+
+📋 DESCRIPTION:
+   Cross-platform command-line utility (Windows, macOS, Linux) to change
+   folder icons, with automatic PNG → ICO conversion on Windows when needed.
+
+🎯 USAGE:
+   seticon [OPTIONS] [COMMANDS]
+
+📝 COMMANDS:
+   set              Set a folder icon
+   convert          Convert PNG to ICO
+   help, --help, -h Show this manual
+
+⚙️  MAIN OPTIONS:
+   -f, --folder <path>     Target folder path
+   -i, --icon <path>       Icon file path (.ico or .png)
+   -o, --output <path>     Output file for conversion
+   -s, --sizes <sizes>     Icon sizes (e.g. 16,32,48,64,128,256)
+   -l, --lang <code>       Set and remember the interface language (en, fr)
+   -v, --verbose           Verbose mode
+   -h, --help              Show this help
+
+📋 EXAMPLES:
+
+   1. Set a folder icon from an ICO file:
+      seticon set -f "./MyFolder" -i "./icon.ico"
+      seticon set --folder "C:\\Users\\Docs" --icon "icon.ico"
+
+   2. Set a folder icon from a PNG (auto-converted):
+      seticon set -f "./Project" -i "./logo.png"
+      seticon set --folder "./Images" --icon "./favicon.png" --sizes 16,32,48
+
+   3. Convert PNG to ICO only:
+      seticon convert -i "./image.png" -o "./icon.ico"
+      seticon convert --icon "logo.png" --output "logo.ico" --sizes 16,32,64,128
+
+   4. Shorthand syntax (positional arguments):
+      seticon "./MyFolder" "./icon.png"
+      seticon convert "./image.png" "./icon.ico"
+
+   5. Switch the language (remembered for next runs):
+      seticon --lang fr
+      seticon -l en
+
+🔧 FEATURES:
+   ✓ Cross-platform support: Windows, macOS, Linux
+   ✓ Multi-size PNG → ICO conversion (Windows only)
+   ✓ Automatic desktop environment detection (GNOME/KDE)
+   ✓ Automatic temporary file cleanup
+   ✓ Comprehensive error handling
+
+📁 SUPPORTED FORMATS:
+   Input (Windows): PNG, ICO
+   Input (macOS):   PNG, JPG, ICNS, GIF, TIFF, BMP, ICO
+   Input (Linux):   PNG, JPG, SVG, ICO, GIF, TIFF, BMP
+   Convert output:  ICO (16, 32, 48, 64, 128, 256 px)
+
+🖥️  PER-PLATFORM BEHAVIOR:
+   Windows  → Creates desktop.ini + applies +H +S +R attributes
+   macOS    → Uses NSWorkspace.setIcon via osascript (Finder)
+   Linux    → gio set metadata::custom-icon (GNOME) + .directory (KDE)
+
+⚠️  IMPORTANT NOTES:
+   • On Windows, PNG → ICO conversion is automatic when needed
+   • On macOS/Linux, the PNG is used directly (no ICO needed)
+   • macOS will ask for Finder automation permission on first run
+   • On Linux, refresh Nautilus (F5) if the icon does not appear right away
+   • Linux/tmpfs (e.g. /tmp): gio metadata is unsupported, only .directory works
+
+🆘 HELP AND SUPPORT:
+   For more information: seticon --help
+   Version: ${version}
+        `,
+            fr: `
 📁 SETICON - Manuel d'utilisation
 ${'='.repeat(34)}
 
@@ -201,6 +317,7 @@ ${'='.repeat(34)}
    -i, --icon <path>       Chemin du fichier icône (.ico ou .png)
    -o, --output <path>     Fichier de sortie pour conversion
    -s, --sizes <sizes>     Tailles d'icône (ex: 16,32,48,64,128,256)
+   -l, --lang <code>       Définir et mémoriser la langue de l'interface (en, fr)
    -v, --verbose          Mode verbeux
    -h, --help             Afficher l'aide
 
@@ -221,6 +338,10 @@ ${'='.repeat(34)}
    4. Syntaxe simplifiée (rétrocompatibilité):
       seticon "./MonDossier" "./icone.png"
       seticon convert "./image.png" "./icon.ico"
+
+   5. Changer la langue (mémorisée pour les prochaines exécutions):
+      seticon --lang fr
+      seticon -l en
 
 🔧 FONCTIONNALITÉS:
    ✓ Support cross-platform : Windows, macOS, Linux
@@ -249,8 +370,10 @@ ${'='.repeat(34)}
 
 🆘 AIDE ET SUPPORT:
    Pour plus d'informations: seticon --help
-   Version: 1.0.0
-        `);
+   Version: ${version}
+        `
+        };
+        console.log(help[lang] || help.en);
     }
 
     cleanup() {
@@ -277,7 +400,8 @@ function parseArguments(args) {
         output: null,
         sizes: [16, 32, 48, 64, 128, 256],
         verbose: false,
-        help: false
+        help: false,
+        lang: null
     };
 
     for (let i = 0; i < args.length; i++) {
@@ -309,6 +433,13 @@ function parseArguments(args) {
             case '-s':
                 if (nextArg) {
                     options.sizes = nextArg.split(',').map(s => parseInt(s.trim()));
+                    i++;
+                }
+                break;
+            case '--lang':
+            case '-l':
+                if (nextArg) {
+                    options.lang = nextArg.toLowerCase();
                     i++;
                 }
                 break;
@@ -354,6 +485,23 @@ async function main() {
 
     if (options.verbose) {
         console.log('🔧 Options:', options);
+    }
+
+    if (options.lang) {
+        if (!SUPPORTED_LANGUAGES.includes(options.lang)) {
+            console.error(`❌ Unsupported language: ${options.lang}. Supported: ${SUPPORTED_LANGUAGES.join(', ')}`);
+            process.exit(1);
+        }
+        const config = loadConfig();
+        config.lang = options.lang;
+        saveConfig(config);
+        console.log(options.lang === 'fr'
+            ? '✓ Langue définie : Français (fr)'
+            : '✓ Language set to: English (en)');
+
+        if (!options.command && !options.help && !options.folder && !options.icon) {
+            return;
+        }
     }
 
     if (args.length === 0 || options.help) {
