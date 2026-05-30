@@ -30,17 +30,6 @@ function removeLegacyFolderIcon(folderPath, desktopIni, keepName) {
     }
 }
 
-function refreshWindowsIcon() {
-    try {
-        execSync('ie4uinit.exe -show', { stdio: 'ignore' });
-    } catch {
-        try {
-            execSync('ie4uinit.exe -ClearIconCache', { stdio: 'ignore' });
-        } catch {
-        }
-    }
-}
-
 export function setFolderIconWindows(folderPath, iconPath) {
     const desktopIni = path.join(folderPath, 'desktop.ini');
     const localIcon = path.join(folderPath, LOCAL_ICON_NAME);
@@ -67,7 +56,6 @@ FolderType=Generic
     fs.writeFileSync(desktopIni, iniContent);
     execSync(`attrib +H +S "${desktopIni}"`, { stdio: 'ignore' });
     execSync(`attrib +R "${folderPath}"`, { stdio: 'ignore' });
-    refreshWindowsIcon();
 
     console.log(`✓ Folder icon changed (Windows): ${folderPath}`);
     return true;
