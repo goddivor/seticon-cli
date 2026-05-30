@@ -2,6 +2,8 @@ import fs from 'fs';
 import path from 'path';
 import { execSync } from 'child_process';
 
+const LOCAL_ICON_NAME = 'seticon.ico';
+
 function clearWindowsAttributes(target) {
     try {
         execSync(`attrib -H -S -R "${target}"`, { stdio: 'ignore' });
@@ -9,7 +11,7 @@ function clearWindowsAttributes(target) {
     }
 }
 
-function removeLegacyFolderIcon(folderPath, desktopIni) {
+function removeLegacyFolderIcon(folderPath, desktopIni, keepName) {
     try {
         const content = fs.readFileSync(desktopIni, 'utf8');
         const match = content.match(/^IconResource=(.+?),\s*\d+\s*$/mi);
@@ -17,6 +19,7 @@ function removeLegacyFolderIcon(folderPath, desktopIni) {
 
         const ref = match[1].trim();
         if (path.isAbsolute(ref)) return;
+        if (path.basename(ref).toLowerCase() === keepName.toLowerCase()) return;
 
         const oldIconPath = path.join(folderPath, ref);
         if (fs.existsSync(oldIconPath)) {
@@ -40,15 +43,22 @@ function refreshWindowsIcon() {
 
 export function setFolderIconWindows(folderPath, iconPath) {
     const desktopIni = path.join(folderPath, 'desktop.ini');
+    const localIcon = path.join(folderPath, LOCAL_ICON_NAME);
 
     clearWindowsAttributes(folderPath);
     if (fs.existsSync(desktopIni)) {
         clearWindowsAttributes(desktopIni);
-        removeLegacyFolderIcon(folderPath, desktopIni);
+        removeLegacyFolderIcon(folderPath, desktopIni, LOCAL_ICON_NAME);
+    }
+    if (fs.existsSync(localIcon)) {
+        clearWindowsAttributes(localIcon);
     }
 
+    fs.copyFileSync(iconPath, localIcon);
+    execSync(`attrib +H +S "${localIcon}"`, { stdio: 'ignore' });
+
     const iniContent = `[.ShellClassInfo]
-IconResource=${iconPath},0
+IconResource=${LOCAL_ICON_NAME},0
 [ViewState]
 Mode=
 Vid=
