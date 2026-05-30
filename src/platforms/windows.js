@@ -11,7 +11,7 @@ function clearWindowsAttributes(target) {
     }
 }
 
-function removeLegacyFolderIcon(folderPath, desktopIni, keepName) {
+function removeLegacyLocalIcon(folderPath, desktopIni) {
     try {
         const content = fs.readFileSync(desktopIni, 'utf8');
         const match = content.match(/^IconResource=(.+?),\s*\d+\s*$/mi);
@@ -19,7 +19,6 @@ function removeLegacyFolderIcon(folderPath, desktopIni, keepName) {
 
         const ref = match[1].trim();
         if (path.isAbsolute(ref)) return;
-        if (path.basename(ref).toLowerCase() === keepName.toLowerCase()) return;
 
         const oldIconPath = path.join(folderPath, ref);
         if (fs.existsSync(oldIconPath)) {
@@ -37,17 +36,15 @@ export function setFolderIconWindows(folderPath, iconPath) {
     clearWindowsAttributes(folderPath);
     if (fs.existsSync(desktopIni)) {
         clearWindowsAttributes(desktopIni);
-        removeLegacyFolderIcon(folderPath, desktopIni, LOCAL_ICON_NAME);
+        removeLegacyLocalIcon(folderPath, desktopIni);
     }
     if (fs.existsSync(localIcon)) {
         clearWindowsAttributes(localIcon);
+        try { fs.unlinkSync(localIcon); } catch {}
     }
 
-    fs.copyFileSync(iconPath, localIcon);
-    execSync(`attrib +H +S "${localIcon}"`, { stdio: 'ignore' });
-
     const iniContent = `[.ShellClassInfo]
-IconResource=${LOCAL_ICON_NAME},0
+IconResource=${iconPath},0
 [ViewState]
 Mode=
 Vid=
