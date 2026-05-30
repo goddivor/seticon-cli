@@ -21,7 +21,7 @@ right mechanism for each desktop environment elsewhere.
 
 </div>
 
-## ✨ Features
+## 🎖️ Features
 
 - **Cross-platform** — Windows, macOS, Linux (GNOME and KDE)
 - **PNG → ICO conversion** built in (multi-size: 16, 32, 48, 64, 128, 256)
