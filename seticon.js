@@ -3,6 +3,7 @@
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
+import crypto from 'crypto';
 import { execSync } from 'child_process';
 import { fileURLToPath } from 'url';
 
@@ -44,6 +45,109 @@ function saveConfig(config) {
 function getLanguage() {
     const lang = loadConfig().lang;
     return SUPPORTED_LANGUAGES.includes(lang) ? lang : 'en';
+}
+
+function getStoreDir() {
+    return path.join(path.dirname(getConfigPath()), 'icons');
+}
+
+function getIndexPath() {
+    return path.join(getStoreDir(), 'index.json');
+}
+
+function loadIndex() {
+    try {
+        return JSON.parse(fs.readFileSync(getIndexPath(), 'utf8'));
+    } catch {
+        return {};
+    }
+}
+
+function saveIndex(index) {
+    fs.mkdirSync(getStoreDir(), { recursive: true });
+    fs.writeFileSync(getIndexPath(), JSON.stringify(index, null, 2));
+}
+
+function sha256Hex(buffer) {
+    return crypto.createHash('sha256').update(buffer).digest('hex');
+}
+
+function rotl32(x, n) {
+    return ((x << n) | (x >>> (32 - n))) >>> 0;
+}
+
+function md4(bytes) {
+    const msg = Array.from(bytes);
+    const bitLen = msg.length * 8;
+    msg.push(0x80);
+    while (msg.length % 64 !== 56) msg.push(0);
+    for (let i = 0; i < 8; i++) {
+        msg.push(Math.floor(bitLen / Math.pow(2, 8 * i)) & 0xff);
+    }
+
+    let a = 0x67452301, b = 0xefcdab89, c = 0x98badcfe, d = 0x10325476;
+    const F = (x, y, z) => ((x & y) | (~x & z)) >>> 0;
+    const G = (x, y, z) => ((x & y) | (x & z) | (y & z)) >>> 0;
+    const H = (x, y, z) => (x ^ y ^ z) >>> 0;
+
+    for (let i = 0; i < msg.length; i += 64) {
+        const X = new Array(16);
+        for (let j = 0; j < 16; j++) {
+            X[j] = (msg[i + j * 4] | (msg[i + j * 4 + 1] << 8) | (msg[i + j * 4 + 2] << 16) | (msg[i + j * 4 + 3] << 24)) >>> 0;
+        }
+        let aa = a, bb = b, cc = c, dd = d;
+
+        const ff = (p, q, r, s, k, sh) => rotl32((p + F(q, r, s) + X[k]) >>> 0, sh);
+        const gg = (p, q, r, s, k, sh) => rotl32((p + G(q, r, s) + X[k] + 0x5a827999) >>> 0, sh);
+        const hh = (p, q, r, s, k, sh) => rotl32((p + H(q, r, s) + X[k] + 0x6ed9eba1) >>> 0, sh);
+
+        const r1 = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
+        for (let n = 0; n < 16; n += 4) {
+            a = ff(a, b, c, d, r1[n], 3);
+            d = ff(d, a, b, c, r1[n + 1], 7);
+            c = ff(c, d, a, b, r1[n + 2], 11);
+            b = ff(b, c, d, a, r1[n + 3], 19);
+        }
+        const r2 = [0, 4, 8, 12, 1, 5, 9, 13, 2, 6, 10, 14, 3, 7, 11, 15];
+        for (let n = 0; n < 16; n += 4) {
+            a = gg(a, b, c, d, r2[n], 3);
+            d = gg(d, a, b, c, r2[n + 1], 5);
+            c = gg(c, d, a, b, r2[n + 2], 9);
+            b = gg(b, c, d, a, r2[n + 3], 13);
+        }
+        const r3 = [0, 8, 4, 12, 2, 10, 6, 14, 1, 9, 5, 13, 3, 11, 7, 15];
+        for (let n = 0; n < 16; n += 4) {
+            a = hh(a, b, c, d, r3[n], 3);
+            d = hh(d, a, b, c, r3[n + 1], 9);
+            c = hh(c, d, a, b, r3[n + 2], 11);
+            b = hh(b, c, d, a, r3[n + 3], 15);
+        }
+
+        a = (a + aa) >>> 0;
+        b = (b + bb) >>> 0;
+        c = (c + cc) >>> 0;
+        d = (d + dd) >>> 0;
+    }
+
+    const out = Buffer.alloc(16);
+    [a, b, c, d].forEach((v, i) => out.writeUInt32LE(v >>> 0, i * 4));
+    return out;
+}
+
+const ED2K_CHUNK = 9728000;
+
+function ed2kHex(buffer) {
+    if (buffer.length <= ED2K_CHUNK) {
+        return md4(buffer).toString('hex');
+    }
+    const hashes = [];
+    for (let i = 0; i < buffer.length; i += ED2K_CHUNK) {
+        hashes.push(md4(buffer.subarray(i, i + ED2K_CHUNK)));
+    }
+    if (buffer.length % ED2K_CHUNK === 0) {
+        hashes.push(md4(Buffer.alloc(0)));
+    }
+    return md4(Buffer.concat(hashes)).toString('hex');
 }
 
 class FolderIconCLI {
@@ -119,14 +223,15 @@ class FolderIconCLI {
 
     setFolderIconWindows(folderPath, iconPath) {
         const desktopIni = path.join(folderPath, 'desktop.ini');
-        const iconFileName = path.basename(iconPath);
-        const iconInFolder = path.join(folderPath, iconFileName);
 
-        fs.copyFileSync(iconPath, iconInFolder);
-        execSync(`attrib +H +S "${iconInFolder}"`, { stdio: 'ignore' });
+        this.clearWindowsAttributes(folderPath);
+        if (fs.existsSync(desktopIni)) {
+            this.clearWindowsAttributes(desktopIni);
+            this.removeLegacyFolderIcon(folderPath, desktopIni);
+        }
 
         const iniContent = `[.ShellClassInfo]
-IconResource=${iconFileName},0
+IconResource=${iconPath},0
 [ViewState]
 Mode=
 Vid=
@@ -135,9 +240,52 @@ FolderType=Generic
         fs.writeFileSync(desktopIni, iniContent);
         execSync(`attrib +H +S "${desktopIni}"`, { stdio: 'ignore' });
         execSync(`attrib +R "${folderPath}"`, { stdio: 'ignore' });
+        this.refreshWindowsIcon(folderPath);
 
         console.log(`✓ Folder icon changed (Windows): ${folderPath}`);
         return true;
+    }
+
+    clearWindowsAttributes(target) {
+        try {
+            execSync(`attrib -H -S -R "${target}"`, { stdio: 'ignore' });
+        } catch {
+        }
+    }
+
+    removeLegacyFolderIcon(folderPath, desktopIni) {
+        try {
+            const content = fs.readFileSync(desktopIni, 'utf8');
+            const match = content.match(/^IconResource=(.+?),\s*\d+\s*$/mi);
+            if (!match) return;
+
+            const ref = match[1].trim();
+            if (path.isAbsolute(ref)) return;
+
+            const oldIconPath = path.join(folderPath, ref);
+            if (fs.existsSync(oldIconPath)) {
+                this.clearWindowsAttributes(oldIconPath);
+                fs.unlinkSync(oldIconPath);
+            }
+        } catch {
+        }
+    }
+
+    refreshWindowsIcon(folderPath) {
+        try {
+            const psPath = folderPath.replace(/'/g, "''");
+            const script = `Add-Type -Namespace SetIcon -Name Shell -MemberDefinition '[System.Runtime.InteropServices.DllImport("shell32.dll")] public static extern void SHChangeNotify(int eventId, uint flags, System.IntPtr item1, System.IntPtr item2);
+[System.Runtime.InteropServices.DllImport("shell32.dll", CharSet = System.Runtime.InteropServices.CharSet.Unicode)] public static extern System.IntPtr ILCreateFromPath(string path);
+[System.Runtime.InteropServices.DllImport("shell32.dll")] public static extern void ILFree(System.IntPtr pidl);'
+$pidl = [SetIcon.Shell]::ILCreateFromPath('${psPath}')
+if ($pidl -ne [System.IntPtr]::Zero) {
+  [SetIcon.Shell]::SHChangeNotify(0x00002000, 0x0000, $pidl, [System.IntPtr]::Zero)
+  [SetIcon.Shell]::ILFree($pidl)
+}`;
+            const encoded = Buffer.from(script, 'utf16le').toString('base64');
+            execSync(`powershell -NoProfile -NonInteractive -EncodedCommand ${encoded}`, { stdio: 'ignore' });
+        } catch {
+        }
     }
 
     setFolderIconMacOS(folderPath, iconPath) {
@@ -190,14 +338,11 @@ if (!success) { throw new Error('NSWorkspace returned false (try granting automa
     async processIconChange(folderPath, iconOrPngPath, dimensions = [16, 32, 48, 64, 128, 256]) {
         try {
             const ext = path.extname(iconOrPngPath).toLowerCase();
-            let iconPath = iconOrPngPath;
+            let needsConversion = false;
 
             if (process.platform === 'win32') {
                 if (ext === '.png') {
-                    console.log('📸 PNG detected, converting to ICO for Windows...');
-                    const tempIcoPath = path.join(this.tempDir, `converted_${Date.now()}.ico`);
-                    iconPath = await this.convertPngToIco(iconOrPngPath, tempIcoPath, dimensions);
-                    console.log(`✓ PNG converted to ICO: ${iconPath}`);
+                    needsConversion = true;
                 } else if (ext !== '.ico') {
                     throw new Error('On Windows, icon must be .ico or .png');
                 }
@@ -208,11 +353,75 @@ if (!success) { throw new Error('NSWorkspace returned false (try granting automa
                 }
             }
 
-            this.setFolderIcon(folderPath, iconPath);
+            const { storePath, storeId } = await this.resolveStoredIcon(iconOrPngPath, needsConversion, dimensions);
+
+            this.setFolderIcon(folderPath, storePath);
+            this.trackUsage(storeId, path.resolve(folderPath));
             return true;
         } catch (error) {
             console.error(`❌ Error: ${error.message}`);
             return false;
+        }
+    }
+
+    async resolveStoredIcon(sourcePath, needsConversion, sizes) {
+        const absSource = path.resolve(sourcePath);
+        if (!fs.existsSync(absSource)) {
+            throw new Error(`Icon file does not exist: ${absSource}`);
+        }
+
+        const buffer = fs.readFileSync(absSource);
+        const sha = sha256Hex(buffer);
+        const sourceExt = path.extname(absSource).toLowerCase();
+        const targetExt = needsConversion ? '.ico' : sourceExt;
+        const sizeKey = needsConversion ? sizes.join('-') : '';
+        const storeId = sizeKey ? `${sha}_${sizeKey}` : sha;
+
+        const storeDir = getStoreDir();
+        fs.mkdirSync(storeDir, { recursive: true });
+        const storePath = path.join(storeDir, `${storeId}${targetExt}`);
+
+        if (fs.existsSync(storePath)) {
+            console.log(`♻️  Reusing cached icon (${storeId.slice(0, 12)}…)`);
+        } else if (needsConversion) {
+            console.log('📸 PNG detected, converting to ICO...');
+            await this.convertPngToIco(absSource, storePath, sizes);
+            console.log('✓ Converted and stored in the icon cache');
+        } else {
+            fs.copyFileSync(absSource, storePath);
+        }
+
+        const index = loadIndex();
+        if (!index[storeId]) {
+            index[storeId] = {
+                sha256: sha,
+                ed2k: ed2kHex(buffer),
+                originalName: path.basename(absSource),
+                sourceExt,
+                sizes: needsConversion ? sizes : null,
+                storeFile: path.basename(storePath),
+                createdAt: new Date().toISOString(),
+                usedBy: []
+            };
+            saveIndex(index);
+        }
+
+        return { storePath, storeId };
+    }
+
+    trackUsage(storeId, folderAbs) {
+        try {
+            const index = loadIndex();
+            for (const id of Object.keys(index)) {
+                if (Array.isArray(index[id].usedBy)) {
+                    index[id].usedBy = index[id].usedBy.filter(f => f !== folderAbs);
+                }
+            }
+            if (index[storeId]) {
+                index[storeId].usedBy.push(folderAbs);
+                saveIndex(index);
+            }
+        } catch {
         }
     }
 
