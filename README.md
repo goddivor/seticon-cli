@@ -2,16 +2,16 @@
 
 # seticon
 
-[![Release](https://img.shields.io/github/v/release/goddivor/seticon-cli?logo=github&label=Release)](https://github.com/goddivor/seticon-cli/releases)
-[![license](https://img.shields.io/npm/l/seticon-cli.svg)](./LICENSE)
-[![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](./.github/CODE_OF_CONDUCT.md)
-[![Downloads](https://img.shields.io/npm/dy/seticon-cli?logo=npm&label=Downloads)](https://www.npmjs.com/package/seticon-cli)
+[![Release](https://img.shields.io/github/v/release/goddivor/seticon-cli?logo=github&logoColor=fff&label=Release&labelColor=333&color=148ACF&style=flat)](https://github.com/goddivor/seticon-cli/releases)
+[![License](https://img.shields.io/npm/l/seticon-cli?logo=github&logoColor=fff&label=License&labelColor=333&color=2BB24C&style=flat)](./LICENSE)
+[![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-F47C00?logo=contributorcovenant&logoColor=fff&labelColor=333&style=flat)](./.github/CODE_OF_CONDUCT.md)
+[![Downloads](https://img.shields.io/npm/dy/seticon-cli?logo=npm&logoColor=CB3837&label=Downloads&labelColor=333&color=CB3837&style=flat)](https://www.npmjs.com/package/seticon-cli)
 
-[![Stars](https://img.shields.io/github/stars/goddivor/seticon-cli?logo=github&label=Stars)](https://github.com/goddivor/seticon-cli/stargazers)
-[![Forks](https://img.shields.io/github/forks/goddivor/seticon-cli?logo=github&label=Forks)](https://github.com/goddivor/seticon-cli/network/members)
-[![Watchers](https://img.shields.io/github/watchers/goddivor/seticon-cli?logo=github&label=Watchers)](https://github.com/goddivor/seticon-cli/watchers)
-[![Contributors](https://img.shields.io/github/contributors/goddivor/seticon-cli?logo=github&label=Contributors)](https://github.com/goddivor/seticon-cli/graphs/contributors)
-[![Open issues](https://img.shields.io/github/issues/goddivor/seticon-cli?logo=github&label=Issues)](https://github.com/goddivor/seticon-cli/issues)
+[![Stars](https://img.shields.io/github/stars/goddivor/seticon-cli?logo=github&logoColor=fff&label=Stars&labelColor=333&color=E3B341&style=flat)](https://github.com/goddivor/seticon-cli/stargazers)
+[![Forks](https://img.shields.io/github/forks/goddivor/seticon-cli?logo=github&logoColor=fff&label=Forks&labelColor=333&color=8957E5&style=flat)](https://github.com/goddivor/seticon-cli/network/members)
+[![Watchers](https://img.shields.io/github/watchers/goddivor/seticon-cli?logo=github&logoColor=fff&label=Watchers&labelColor=333&color=1F6FEB&style=flat)](https://github.com/goddivor/seticon-cli/watchers)
+[![Contributors](https://img.shields.io/github/contributors/goddivor/seticon-cli?logo=github&logoColor=fff&label=Contributors&labelColor=333&color=DB61A2&style=flat)](https://github.com/goddivor/seticon-cli/graphs/contributors)
+[![Open issues](https://img.shields.io/github/issues/goddivor/seticon-cli?logo=github&logoColor=fff&label=Issues&labelColor=333&color=3FB950&style=flat)](https://github.com/goddivor/seticon-cli/issues)
 
 Cross-platform CLI to change folder icons on **Windows**, **macOS** and **Linux**.
 
