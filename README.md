@@ -1,11 +1,27 @@
+<div align="center">
+
 # seticon
+
+[![JavaScript](https://img.shields.io/badge/JavaScript-323330?logo=javascript&logoColor=F7DF1E&style=flat)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
+[![Release](https://img.shields.io/github/v/release/goddivor/seticon-cli?logo=github&logoColor=fff&label=Release&labelColor=333&color=148ACF&style=flat)](https://github.com/goddivor/seticon-cli/releases)
+[![License](https://img.shields.io/npm/l/seticon-cli?logo=github&logoColor=fff&label=License&labelColor=333&color=2BB24C&style=flat)](./LICENSE)
+[![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-F47C00?logo=contributorcovenant&logoColor=fff&labelColor=333&style=flat)](./.github/CODE_OF_CONDUCT.md)
+[![Downloads](https://img.shields.io/npm/dy/seticon-cli?logo=npm&logoColor=CB3837&label=Downloads&labelColor=333&color=CB3837&style=flat)](https://www.npmjs.com/package/seticon-cli)
+
+[![Stars](https://img.shields.io/github/stars/goddivor/seticon-cli?logo=github&logoColor=fff&label=Stars&labelColor=333&color=E3B341&style=flat)](https://github.com/goddivor/seticon-cli/stargazers)
+[![Forks](https://img.shields.io/github/forks/goddivor/seticon-cli?logo=github&logoColor=fff&label=Forks&labelColor=333&color=8957E5&style=flat)](https://github.com/goddivor/seticon-cli/network/members)
+[![Watchers](https://img.shields.io/github/watchers/goddivor/seticon-cli?logo=github&logoColor=fff&label=Watchers&labelColor=333&color=1F6FEB&style=flat)](https://github.com/goddivor/seticon-cli/watchers)
+[![Contributors](https://img.shields.io/github/contributors/goddivor/seticon-cli?logo=github&logoColor=fff&label=Contributors&labelColor=333&color=DB61A2&style=flat)](https://github.com/goddivor/seticon-cli/graphs/contributors)
+[![Open issues](https://img.shields.io/github/issues/goddivor/seticon-cli?logo=github&logoColor=fff&label=Issues&labelColor=333&color=3FB950&style=flat)](https://github.com/goddivor/seticon-cli/issues)
 
 Cross-platform CLI to change folder icons on **Windows**, **macOS** and **Linux**.
 
 Automatically converts PNG icons to multi-size ICO on Windows, and uses the
 right mechanism for each desktop environment elsewhere.
 
-## Features
+</div>
+
+## 🎖️ Features
 
 - **Cross-platform** — Windows, macOS, Linux (GNOME and KDE)
 - **PNG → ICO conversion** built in (multi-size: 16, 32, 48, 64, 128, 256)
@@ -16,19 +32,48 @@ right mechanism for each desktop environment elsewhere.
   - macOS   → `NSWorkspace.setIcon` via `osascript` (Finder)
   - Linux   → `gio set metadata::custom-icon` (GNOME) + `.directory` (KDE)
 
-## Installation
+## 📋 Requirements
+
+- Node.js >= 18.17.0
+- Windows: works out of the box
+- macOS: Finder automation permission (prompted on first run)
+- Linux: `gio` (part of `glib2`, present by default on most distros)
+
+## 📦 Installation
 
 ```bash
-npm install -g seticon
+# npm
+npm i seticon-cli
+
+# yarn
+yarn add seticon-cli
+
+# pnpm
+pnpm add seticon-cli
 ```
 
-Node.js **18.17+** is required.
+Or install it globally to use the `seticon` command anywhere:
 
-## Usage
+```bash
+# npm
+npm i -g seticon-cli
+
+# yarn
+yarn global add seticon-cli
+
+# pnpm
+pnpm add -g seticon-cli
+```
+
+## ⚙️ Usage
 
 ```bash
 # Set a folder icon (auto-converts PNG → ICO on Windows)
 seticon set -f "./MyFolder" -i "./icon.png"
+
+# Shorthand: positional arguments, no flags needed
+seticon "./MyFolder" "./icon.png"
+seticon convert "./image.png" "./icon.ico"
 
 # Long options also work
 seticon set --folder "Documents" --icon "logo.ico"
@@ -41,9 +86,13 @@ seticon convert --icon "photo.png" --output "icon.ico" --sizes 16,32,48
 
 # Show the full manual
 seticon --help
+
+# Switch the interface language, remembered for next runs (en, fr)
+seticon --lang fr
+seticon -l en
 ```
 
-### Supported icon formats per OS
+### 🖼️ Supported icon formats per OS
 
 | OS      | Formats accepted               | Notes                                                |
 | ------- | ------------------------------ | ---------------------------------------------------- |
@@ -51,44 +100,12 @@ seticon --help
 | macOS   | `.png` / `.jpg` / `.tiff` / `.icns` | Asks for Finder automation permission on first run |
 | Linux   | `.png` / `.jpg` / `.svg` / `.ico` | GNOME via `gio`, KDE via `.directory`              |
 
-## How it works
+## 🤝 Contributing
 
-### Windows
-Writes a `desktop.ini` file inside the target folder:
+We welcome contributions of all kinds — bug reports, feature ideas, documentation
+fixes and pull requests. Please read the [contributing guide](./.github/CONTRIBUTING.md)
+and follow our [code of conduct](./.github/CODE_OF_CONDUCT.md) before getting started.
 
-```ini
-[.ShellClassInfo]
-IconResource=path\to\icon.ico,0
-```
+## 📜 License
 
-Then applies `+H +S` to the `desktop.ini` and `+R` to the folder so Explorer
-picks up the icon.
-
-### macOS
-Calls `NSWorkspace.sharedWorkspace.setIcon_forFile_options_` via JXA
-(`osascript -l JavaScript`). The first run will ask for Finder automation
-permission.
-
-### Linux
-- **GNOME / Nautilus**: `gio set "<folder>" metadata::custom-icon "file://<icon>"`
-- **KDE / Dolphin**: writes a `.directory` file with `Icon=<absolute path>`
-
-Both are applied so the icon shows up regardless of the file manager.
-You may need to refresh the file manager (F5) to see the change.
-
-## Requirements
-
-- Node.js >= 18.17.0
-- Windows: works out of the box
-- macOS: Finder automation permission (prompted on first run)
-- Linux: `gio` (part of `glib2`, present by default on most distros)
-
-## License
-
-MIT © Divor
-
-## Links
-
-- [Repository](https://github.com/goddivor/seticon-cli)
-- [Issues](https://github.com/goddivor/seticon-cli/issues)
-- [npm package](https://www.npmjs.com/package/seticon-cli)
+Licensed under MIT License and copyrights reserved.
