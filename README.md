@@ -2,6 +2,7 @@
 
 # seticon
 
+[![JavaScript](https://img.shields.io/badge/Language-JavaScript-F7DF1E?logo=javascript&logoColor=fff&labelColor=333&style=flat)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
 [![Release](https://img.shields.io/github/v/release/goddivor/seticon-cli?logo=github&logoColor=fff&label=Release&labelColor=333&color=148ACF&style=flat)](https://github.com/goddivor/seticon-cli/releases)
 [![License](https://img.shields.io/npm/l/seticon-cli?logo=github&logoColor=fff&label=License&labelColor=333&color=2BB24C&style=flat)](./LICENSE)
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-F47C00?logo=contributorcovenant&logoColor=fff&labelColor=333&style=flat)](./.github/CODE_OF_CONDUCT.md)
@@ -20,7 +21,7 @@ right mechanism for each desktop environment elsewhere.
 
 </div>
 
-## Features
+## ✨ Features
 
 - **Cross-platform** — Windows, macOS, Linux (GNOME and KDE)
 - **PNG → ICO conversion** built in (multi-size: 16, 32, 48, 64, 128, 256)
@@ -31,26 +32,40 @@ right mechanism for each desktop environment elsewhere.
   - macOS   → `NSWorkspace.setIcon` via `osascript` (Finder)
   - Linux   → `gio set metadata::custom-icon` (GNOME) + `.directory` (KDE)
 
-## Requirements
+## 📋 Requirements
 
 - Node.js >= 18.17.0
 - Windows: works out of the box
 - macOS: Finder automation permission (prompted on first run)
 - Linux: `gio` (part of `glib2`, present by default on most distros)
 
-## Installation
+## 📦 Installation
 
 ```bash
+# npm
 npm i seticon-cli
+
+# yarn
+yarn add seticon-cli
+
+# pnpm
+pnpm add seticon-cli
 ```
 
 Or install it globally to use the `seticon` command anywhere:
 
 ```bash
+# npm
 npm i -g seticon-cli
+
+# yarn
+yarn global add seticon-cli
+
+# pnpm
+pnpm add -g seticon-cli
 ```
 
-## Usage
+## ⚙️ Usage
 
 ```bash
 # Set a folder icon (auto-converts PNG → ICO on Windows)
@@ -77,10 +92,14 @@ seticon --lang fr
 seticon -l en
 ```
 
-### Supported icon formats per OS
+### 🖼️ Supported icon formats per OS
 
 | OS      | Formats accepted               | Notes                                                |
 | ------- | ------------------------------ | ---------------------------------------------------- |
 | Windows | `.ico` (PNG auto-converted)    | `desktop.ini` written + folder marked system/hidden  |
 | macOS   | `.png` / `.jpg` / `.tiff` / `.icns` | Asks for Finder automation permission on first run |
 | Linux   | `.png` / `.jpg` / `.svg` / `.ico` | GNOME via `gio`, KDE via `.directory`              |
+
+## 📜 License
+
+Licensed under MIT License and copyrights reserved.
