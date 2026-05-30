@@ -2,7 +2,7 @@
 
 # seticon
 
-[![JavaScript](https://img.shields.io/badge/Language-JavaScript-F7DF1E?logo=javascript&logoColor=fff&labelColor=333&style=flat)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
+[![JavaScript](https://img.shields.io/badge/-F7DF1E?logo=javascript&logoColor=000&style=flat)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
 [![Release](https://img.shields.io/github/v/release/goddivor/seticon-cli?logo=github&logoColor=fff&label=Release&labelColor=333&color=148ACF&style=flat)](https://github.com/goddivor/seticon-cli/releases)
 [![License](https://img.shields.io/npm/l/seticon-cli?logo=github&logoColor=fff&label=License&labelColor=333&color=2BB24C&style=flat)](./LICENSE)
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-F47C00?logo=contributorcovenant&logoColor=fff&labelColor=333&style=flat)](./.github/CODE_OF_CONDUCT.md)
