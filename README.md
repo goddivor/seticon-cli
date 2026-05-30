@@ -100,6 +100,12 @@ seticon -l en
 | macOS   | `.png` / `.jpg` / `.tiff` / `.icns` | Asks for Finder automation permission on first run |
 | Linux   | `.png` / `.jpg` / `.svg` / `.ico` | GNOME via `gio`, KDE via `.directory`              |
 
+## 🤝 Contributing
+
+We welcome contributions of all kinds — bug reports, feature ideas, documentation
+fixes and pull requests. Please read the [contributing guide](./.github/CONTRIBUTING.md)
+and follow our [code of conduct](./.github/CODE_OF_CONDUCT.md) before getting started.
+
 ## 📜 License
 
 Licensed under MIT License and copyrights reserved.
