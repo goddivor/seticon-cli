@@ -22,7 +22,8 @@ export function parseArguments(args) {
         iconColor: 'original',
         zoom: 1,
         text: null,
-        textColor: null
+        textColor: null,
+        unknownOption: false
     };
 
     for (let i = 0; i < args.length; i++) {
@@ -119,10 +120,16 @@ export function parseArguments(args) {
                 options.command = arg;
                 break;
             default:
+                if (arg.startsWith('-')) {
+                    // Unknown flag: warn instead of silently ignoring (e.g. a
+                    // typo like --ov instead of -ov).
+                    console.error(`⚠️  Unknown option: ${arg}`);
+                    options.unknownOption = true;
+                    break;
+                }
                 // Positional shorthand: `seticon "./folder" ["./icon"]`.
-                // Only consume the next token as the icon when it is not a flag,
-                // so options like --text are not mistaken for the image.
-                if (!arg.startsWith('-') && !options.command) {
+                // Only consume the next token as the icon when it is not a flag.
+                if (!options.command) {
                     options.command = 'set';
                     options.folder = arg;
                     if (nextArg && !nextArg.startsWith('-')) {
@@ -165,6 +172,11 @@ export async function main() {
     if (args.length === 0 || options.help) {
         showHelp();
         return;
+    }
+
+    if (options.unknownOption) {
+        console.log('💡 Run "seticon --help" to see the available options.');
+        process.exit(1);
     }
 
     try {

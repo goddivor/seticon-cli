@@ -34,6 +34,8 @@ ${'='.repeat(34)}
    -va, --variant <name|hex>  Folder color. mac/windows: a preset variant name;
                            linux: a color preset (blue, green, red, ...) or #hex
    -ic, --icon-color <mode>   original (keep image colors) or variant (tint to folder)
+   -t,  --text <text>      Draw text on the folder instead of an image
+   -tc, --text-color <hex>    Text color (default: the folder color)
    -z,  --zoom <level>     Overlay size: 75, 92, 100, 108, 125
 
 📋 EXAMPLES:
@@ -59,7 +61,11 @@ ${'='.repeat(34)}
       seticon set -i "logo.svg" -o "icon.ico" --overlay --os mac --variant red
       seticon set -f "./Dev" -i "js.png" --overlay --variant blue --icon-color variant --zoom 125
 
-   6. Switch the language (remembered for next runs):
+   6. Draw text on a folder (overlay mode):
+      seticon set -f "./Work" --text "WORK" --overlay --variant blue
+      seticon set -f "./Docs" -t "DOCS" -ov -va red -tc "#ffffff"
+
+   7. Switch the language (remembered for next runs):
       seticon --lang fr
       seticon -l en
 
@@ -124,6 +130,8 @@ ${'='.repeat(34)}
    -va, --variant <nom|hex>   Couleur du dossier. mac/windows : un nom de variante ;
                            linux : un preset (blue, green, red, ...) ou #hex
    -ic, --icon-color <mode>   original (garder les couleurs) ou variant (teinter au dossier)
+   -t,  --text <texte>     Écrire du texte sur le dossier au lieu d'une image
+   -tc, --text-color <hex>    Couleur du texte (défaut : la couleur du dossier)
    -z,  --zoom <niveau>    Taille de l'overlay : 75, 92, 100, 108, 125
 
 📋 EXEMPLES D'UTILISATION:
@@ -149,7 +157,11 @@ ${'='.repeat(34)}
       seticon set -i "logo.svg" -o "icon.ico" --overlay --os mac --variant red
       seticon set -f "./Dev" -i "js.png" --overlay --variant blue --icon-color variant --zoom 125
 
-   6. Changer la langue (mémorisée pour les prochaines exécutions):
+   6. Écrire du texte sur un dossier (mode overlay):
+      seticon set -f "./Travail" --text "WORK" --overlay --variant blue
+      seticon set -f "./Docs" -t "DOCS" -ov -va red -tc "#ffffff"
+
+   7. Changer la langue (mémorisée pour les prochaines exécutions):
       seticon --lang fr
       seticon -l en
 

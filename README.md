@@ -26,7 +26,7 @@ ICO, then applies the icon using the right mechanism for each desktop environmen
 - **Cross-platform** — Windows, macOS, Linux (GNOME and KDE)
 - **Many input formats** — `ico`, `png`, `jpg`, `jpeg`, `bmp`, `tif`, `tiff`, `webp`, `svg`
 - **Automatic ICO conversion** built in (multi-size: 16, 32, 48, 64, 128, 256); `png` and `ico` are used as-is
-- **Overlay mode** — lay your image over a real folder icon, with color variants and zoom
+- **Overlay mode** — lay your image (or text) over a real folder icon, with color variants and zoom
 - **Content-addressed icon cache** with deduplication (same image reused, never re-converted)
 - **No admin / sudo required** for the icon change itself
 - **Detects the OS** and applies the correct mechanism automatically:
@@ -112,6 +112,10 @@ seticon set -f "./Dev" -i "js.png" -ov -va blue -ic variant -z 125
 
 # Linux uses your current icon theme; color it with a preset or a hex
 seticon set -f "./Photos" -i "cam.png" -ov -va "#e67e22"
+
+# Draw text on the folder instead of an image
+seticon set -f "./Work" --text "WORK" --overlay --variant blue
+seticon set -f "./Docs" -t "DOCS" -ov -va red -tc "#ffffff"
 ```
 
 | Option | Alias | Values | Notes |
@@ -120,7 +124,11 @@ seticon set -f "./Photos" -i "cam.png" -ov -va "#e67e22"
 | `--os` | `-os` | `mac`, `windows`, `linux` | Folder style (default: current OS) |
 | `--variant` | `-va` | mac/windows: variant name · linux: color preset or `#hex` | Folder color |
 | `--icon-color` | `-ic` | `original`, `variant` | Keep image colors or tint to folder |
+| `--text` | `-t` | any short text | Draw text instead of an image |
+| `--text-color` | `-tc` | `#hex` | Text color (default: the folder color) |
 | `--zoom` | `-z` | `75`, `92`, `100`, `108`, `125` | Overlay size |
+
+> Overlay accepts **either** an image (`-i`) **or** text (`--text`), not both.
 
 > On **Linux**, the base folder is read from your current icon theme (Adwaita,
 > Yaru, Breeze…) — nothing is bundled. On **macOS/Windows**, bundled folder
