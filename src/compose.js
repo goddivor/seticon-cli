@@ -98,18 +98,65 @@ async function resolveBaseBuffer(sharp, os, variant) {
     return { baseBuffer, constraints, tint: ICON_COLOR[colorKey] || null };
 }
 
+function escapeXml(s) {
+    return s.replace(/[<>&'"]/g, (c) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', "'": '&apos;', '"': '&quot;' }[c]));
+}
+
+function rgbToHex(c) {
+    const h = (v) => v.toString(16).padStart(2, '0');
+    return `#${h(c.r)}${h(c.g)}${h(c.b)}`;
+}
+
+// Render text to a PNG buffer that fits within the folder area.
+// Render at a large fixed size, trim to the real glyph bounds, then scale to fit.
+async function renderText(sharp, text, color, c) {
+    const maxW = Math.round(c.maxWidth);
+    const maxH = Math.round(c.maxHeight);
+    const RENDER = 400;
+
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="4000" height="${RENDER * 2}">
+<text x="20" y="${RENDER}" font-family="sans-serif" font-weight="bold" font-size="${RENDER}"
+fill="${color}">${escapeXml(text)}</text>
+</svg>`;
+    const rendered = await sharp(Buffer.from(svg)).png().trim().toBuffer();
+    const meta = await sharp(rendered).metadata();
+
+    const ratio = Math.min(maxW / meta.width, maxH / meta.height, 1);
+    const w = Math.max(1, Math.round(meta.width * ratio));
+    const h = Math.max(1, Math.round(meta.height * ratio));
+    return sharp(rendered).resize(w, h, { fit: 'fill' }).png().toBuffer();
+}
+
 /**
- * Compose a folder icon: folder base + optional overlay image laid on top.
+ * Compose a folder icon: folder base + optional overlay (image or text).
  * - os: 'mac' | 'windows' | 'linux'
  * - variant: variant name (mac/win) or color preset/hex (linux base tint)
- * - overlay: path to a user image (or null for the bare base)
- * - adjustColor: recolor the overlay to match the variant/color (all OSes)
+ * - overlay: path to a user image (or null)
+ * - text: text to draw on the folder (mutually exclusive with overlay)
+ * - textColor: hex color for the text (defaults to the folder color)
+ * - adjustColor: recolor the image overlay to match the variant/color
  * - scale: overlay zoom factor
  * Returns a PNG buffer (1024x1024).
  */
-export async function composeFolderIcon({ os, variant, overlay, adjustColor = false, scale = 1 }) {
+export async function composeFolderIcon({ os, variant, overlay, text, textColor, adjustColor = false, scale = 1 }) {
     const { default: sharp } = await import('sharp');
     const { baseBuffer, constraints, tint } = await resolveBaseBuffer(sharp, os, variant);
+
+    if (text) {
+        const c = {
+            maxWidth: constraints.maxWidth * scale,
+            maxHeight: constraints.maxHeight * scale,
+        };
+        const color = textColor || (tint ? rgbToHex(tint) : '#ffffff');
+        const textBuf = await renderText(sharp, text, color, c);
+        const meta = await sharp(textBuf).metadata();
+        const top = Math.round(constraints.startY + constraints.folderAreaHeight / 2 - meta.height / 2);
+        const left = Math.round(CANVAS / 2 - meta.width / 2);
+        return sharp(baseBuffer)
+            .composite([{ input: textBuf, top, left }])
+            .png()
+            .toBuffer();
+    }
 
     if (!overlay) {
         return sharp(baseBuffer).png().toBuffer();

@@ -16,8 +16,11 @@ import { convertToIco } from './convert.js';
  *   - iconColor: 'original' (default) | 'variant'
  */
 export async function processOverlayIcon(opts) {
-    if (!opts.image) {
-        throw new Error('Overlay mode requires an image (-i <image>)');
+    if (!opts.image && !opts.text) {
+        throw new Error('Overlay mode requires an image (-i <image>) or text (--text "...")');
+    }
+    if (opts.image && opts.text) {
+        throw new Error('Overlay mode accepts either an image or text, not both');
     }
     if (!opts.folder && !opts.output) {
         throw new Error('Overlay mode requires either -f <folder> (apply) or -o <file> (save)');
@@ -31,6 +34,8 @@ export async function processOverlayIcon(opts) {
         os: osKey,
         variant: opts.variant,
         overlay: opts.image,
+        text: opts.text,
+        textColor: opts.textColor,
         adjustColor,
         scale: opts.zoom || 1,
     });

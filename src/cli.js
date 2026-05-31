@@ -20,7 +20,9 @@ export function parseArguments(args) {
         os: null,
         variant: null,
         iconColor: 'original',
-        zoom: 1
+        zoom: 1,
+        text: null,
+        textColor: null
     };
 
     for (let i = 0; i < args.length; i++) {
@@ -91,6 +93,20 @@ export function parseArguments(args) {
             case '-z':
                 if (nextArg) {
                     options.zoom = ZOOM_LEVELS[nextArg.replace('%', '')] || 1;
+                    i++;
+                }
+                break;
+            case '--text':
+            case '-t':
+                if (nextArg !== undefined) {
+                    options.text = nextArg;
+                    i++;
+                }
+                break;
+            case '--text-color':
+            case '-tc':
+                if (nextArg) {
+                    options.textColor = nextArg;
                     i++;
                 }
                 break;
@@ -174,9 +190,10 @@ export async function main() {
 
         } else if (options.command === 'set') {
             if (options.overlay) {
-                if (!options.icon || (!options.folder && !options.output)) {
-                    console.error('❌ Overlay mode requires --icon and either --folder or --output');
+                if ((!options.icon && !options.text) || (!options.folder && !options.output)) {
+                    console.error('❌ Overlay mode requires --icon or --text, and either --folder or --output');
                     console.log('💡 Example: seticon set -f "./MyFolder" -i "logo.png" --overlay --os mac --variant blue');
+                    console.log('💡 Example: seticon set -f "./MyFolder" --text "DEV" --overlay --variant blue');
                     process.exit(1);
                 }
 
@@ -184,6 +201,8 @@ export async function main() {
                     folder: options.folder,
                     output: options.output,
                     image: options.icon,
+                    text: options.text,
+                    textColor: options.textColor,
                     os: options.os,
                     variant: options.variant,
                     iconColor: options.iconColor,
