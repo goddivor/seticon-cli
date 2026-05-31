@@ -54,7 +54,7 @@ export async function processOverlayIcon(opts) {
             return true;
         }
 
-        return processIconChange(opts.folder, tmpPng, opts.sizes);
+        return await processIconChange(opts.folder, tmpPng, opts.sizes);
     } finally {
         try { fs.unlinkSync(tmpPng); } catch {}
     }
