@@ -124,7 +124,7 @@ seticon set -f "./Photos" -i "cam.png" -ov -va "#e67e22"
 
 > On **Linux**, the base folder is read from your current icon theme (Adwaita,
 > Yaru, Breeze…) — nothing is bundled. On **macOS/Windows**, bundled folder
-> looks are used. macOS HD/flat-drive variants are not yet supported.
+> looks are used.
 
 ### 🖼️ Supported formats
 
