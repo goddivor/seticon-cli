@@ -63,27 +63,32 @@ export function parseArguments(args) {
                 }
                 break;
             case '--overlay':
+            case '-ov':
                 options.overlay = true;
                 break;
             case '--os':
+            case '-os':
                 if (nextArg) {
                     options.os = nextArg.toLowerCase();
                     i++;
                 }
                 break;
             case '--variant':
+            case '-va':
                 if (nextArg) {
                     options.variant = nextArg.toLowerCase();
                     i++;
                 }
                 break;
             case '--icon-color':
+            case '-ic':
                 if (nextArg) {
                     options.iconColor = nextArg.toLowerCase();
                     i++;
                 }
                 break;
             case '--zoom':
+            case '-z':
                 if (nextArg) {
                     options.zoom = ZOOM_LEVELS[nextArg.replace('%', '')] || 1;
                     i++;

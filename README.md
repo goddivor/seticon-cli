@@ -26,6 +26,7 @@ ICO, then applies the icon using the right mechanism for each desktop environmen
 - **Cross-platform** — Windows, macOS, Linux (GNOME and KDE)
 - **Many input formats** — `ico`, `png`, `jpg`, `jpeg`, `bmp`, `tif`, `tiff`, `webp`, `svg`
 - **Automatic ICO conversion** built in (multi-size: 16, 32, 48, 64, 128, 256); `png` and `ico` are used as-is
+- **Overlay mode** — lay your image over a real folder icon, with color variants and zoom
 - **Content-addressed icon cache** with deduplication (same image reused, never re-converted)
 - **No admin / sudo required** for the icon change itself
 - **Detects the OS** and applies the correct mechanism automatically:
@@ -93,6 +94,37 @@ seticon --help
 seticon --lang fr
 seticon -l en
 ```
+
+### 🎨 Overlay mode
+
+Instead of using your image directly, lay it over a real folder icon (à la
+FolderArt). Add `--overlay` (`-ov`):
+
+```bash
+# Lay an image over the current OS folder, then apply it
+seticon set -f "./MyFolder" -i "./logo.png" --overlay
+
+# Pick the folder style and color, save to a file
+seticon set -i "logo.svg" -o "icon.ico" --overlay --os mac --variant red
+
+# Tint the overlay to match the folder color, and zoom it (short aliases)
+seticon set -f "./Dev" -i "js.png" -ov -va blue -ic variant -z 125
+
+# Linux uses your current icon theme; color it with a preset or a hex
+seticon set -f "./Photos" -i "cam.png" -ov -va "#e67e22"
+```
+
+| Option | Alias | Values | Notes |
+| ------ | ----- | ------ | ----- |
+| `--overlay` | `-ov` | — | Enable overlay mode |
+| `--os` | `-os` | `mac`, `windows`, `linux` | Folder style (default: current OS) |
+| `--variant` | `-va` | mac/windows: variant name · linux: color preset or `#hex` | Folder color |
+| `--icon-color` | `-ic` | `original`, `variant` | Keep image colors or tint to folder |
+| `--zoom` | `-z` | `75`, `92`, `100`, `108`, `125` | Overlay size |
+
+> On **Linux**, the base folder is read from your current icon theme (Adwaita,
+> Yaru, Breeze…) — nothing is bundled. On **macOS/Windows**, bundled folder
+> looks are used. macOS HD/flat-drive variants are not yet supported.
 
 ### 🖼️ Supported formats
 

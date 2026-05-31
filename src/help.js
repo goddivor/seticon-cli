@@ -29,12 +29,12 @@ ${'='.repeat(34)}
    -h, --help              Show this help
 
 🖼️  OVERLAY OPTIONS (lay the image over a folder base):
-   --overlay               Compose the image onto a folder instead of using it directly
-   --os <name>             Folder style: mac, windows, linux (default: current OS)
-   --variant <name|hex>    Folder color. mac/windows: a preset variant name;
+   -ov, --overlay          Compose the image onto a folder instead of using it directly
+   -os, --os <name>        Folder style: mac, windows, linux (default: current OS)
+   -va, --variant <name|hex>  Folder color. mac/windows: a preset variant name;
                            linux: a color preset (blue, green, red, ...) or #hex
-   --icon-color <mode>     original (keep image colors) or variant (tint to folder)
-   --zoom <level>          Overlay size: 75, 92, 100, 108, 125
+   -ic, --icon-color <mode>   original (keep image colors) or variant (tint to folder)
+   -z,  --zoom <level>     Overlay size: 75, 92, 100, 108, 125
 
 📋 EXAMPLES:
 
@@ -119,12 +119,12 @@ ${'='.repeat(34)}
    -h, --help             Afficher l'aide
 
 🖼️  OPTIONS OVERLAY (poser l'image sur un dossier) :
-   --overlay               Composer l'image sur un dossier au lieu de l'utiliser telle quelle
-   --os <nom>              Style de dossier : mac, windows, linux (défaut : OS courant)
-   --variant <nom|hex>     Couleur du dossier. mac/windows : un nom de variante ;
+   -ov, --overlay          Composer l'image sur un dossier au lieu de l'utiliser telle quelle
+   -os, --os <nom>         Style de dossier : mac, windows, linux (défaut : OS courant)
+   -va, --variant <nom|hex>   Couleur du dossier. mac/windows : un nom de variante ;
                            linux : un preset (blue, green, red, ...) ou #hex
-   --icon-color <mode>     original (garder les couleurs) ou variant (teinter au dossier)
-   --zoom <niveau>         Taille de l'overlay : 75, 92, 100, 108, 125
+   -ic, --icon-color <mode>   original (garder les couleurs) ou variant (teinter au dossier)
+   -z,  --zoom <niveau>    Taille de l'overlay : 75, 92, 100, 108, 125
 
 📋 EXEMPLES D'UTILISATION:
 
