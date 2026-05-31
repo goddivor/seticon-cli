@@ -9,14 +9,14 @@ ${'='.repeat(34)}
 
 📋 DESCRIPTION:
    Cross-platform command-line utility (Windows, macOS, Linux) to change
-   folder icons, with automatic PNG → ICO conversion on Windows when needed.
+   folder icons, with automatic conversion of common image formats to ICO.
 
 🎯 USAGE:
    seticon [OPTIONS] [COMMANDS]
 
 📝 COMMANDS:
    set              Set a folder icon
-   convert          Convert PNG to ICO
+   convert          Convert an image to ICO
    help, --help, -h Show this manual
 
 ⚙️  MAIN OPTIONS:
@@ -34,17 +34,17 @@ ${'='.repeat(34)}
       seticon set -f "./MyFolder" -i "./icon.ico"
       seticon set --folder "C:\\Users\\Docs" --icon "icon.ico"
 
-   2. Set a folder icon from a PNG (auto-converted):
+   2. Set a folder icon from any image (auto-converted to ICO):
       seticon set -f "./Project" -i "./logo.png"
-      seticon set --folder "./Images" --icon "./favicon.png" --sizes 16,32,48
+      seticon set --folder "./Images" --icon "./photo.webp" --sizes 16,32,48
 
-   3. Convert PNG to ICO only:
-      seticon convert -i "./image.png" -o "./icon.ico"
-      seticon convert --icon "logo.png" --output "logo.ico" --sizes 16,32,64,128
+   3. Convert an image to ICO only:
+      seticon convert -i "./image.jpg" -o "./icon.ico"
+      seticon convert --icon "logo.svg" --output "logo.ico" --sizes 16,32,64,128
 
    4. Shorthand syntax (positional arguments):
       seticon "./MyFolder" "./icon.png"
-      seticon convert "./image.png" "./icon.ico"
+      seticon convert "./image.bmp" "./icon.ico"
 
    5. Switch the language (remembered for next runs):
       seticon --lang fr
@@ -52,7 +52,7 @@ ${'='.repeat(34)}
 
 🔧 FEATURES:
    ✓ Cross-platform support: Windows, macOS, Linux
-   ✓ Multi-size PNG → ICO conversion (Windows only)
+   ✓ Multi-size image → ICO conversion (jpg, jpeg, bmp, tif, tiff, webp, svg)
    ✓ Automatic desktop environment detection (GNOME/KDE)
    ✓ Content-addressed icon cache with deduplication
    ✓ Comprehensive error handling
@@ -69,8 +69,8 @@ ${'='.repeat(34)}
    Linux    → gio set metadata::custom-icon (GNOME) + .directory (KDE)
 
 ⚠️  IMPORTANT NOTES:
-   • On Windows, PNG → ICO conversion is automatic when needed
-   • On macOS/Linux, the PNG is used directly (no ICO needed)
+   • PNG and ICO are used as-is; other formats are auto-converted to ICO
+   • Conversion applies on all platforms (the cached ICO is reused if unchanged)
    • macOS will ask for Finder automation permission on first run
    • On Linux, refresh Nautilus (F5) if the icon does not appear right away
    • Linux/tmpfs (e.g. /tmp): gio metadata is unsupported, only .directory works
@@ -85,15 +85,15 @@ ${'='.repeat(34)}
 
 📋 DESCRIPTION:
    Utilitaire en ligne de commande cross-platform (Windows, macOS, Linux)
-   pour changer les icônes de dossiers, avec conversion PNG → ICO sur
-   Windows si nécessaire.
+   pour changer les icônes de dossiers, avec conversion automatique des
+   formats d'image courants vers ICO.
 
 🎯 UTILISATION:
    seticon [OPTIONS] [COMMANDES]
 
 📝 COMMANDES:
    set              Définir l'icône d'un dossier
-   convert          Convertir PNG vers ICO
+   convert          Convertir une image vers ICO
    help, --help, -h Afficher ce manuel
 
 ⚙️  OPTIONS PRINCIPALES:
@@ -111,17 +111,17 @@ ${'='.repeat(34)}
       seticon set -f "./MonDossier" -i "./icone.ico"
       seticon set --folder "C:\\Users\\Docs" --icon "icon.ico"
 
-   2. Changer l'icône avec un PNG (conversion automatique):
+   2. Changer l'icône avec n'importe quelle image (conversion auto vers ICO):
       seticon set -f "./Projet" -i "./logo.png"
-      seticon set --folder "./Images" --icon "./favicon.png" --sizes 16,32,48
+      seticon set --folder "./Images" --icon "./photo.webp" --sizes 16,32,48
 
-   3. Convertir PNG vers ICO uniquement:
-      seticon convert -i "./image.png" -o "./icone.ico"
-      seticon convert --icon "logo.png" --output "logo.ico" --sizes 16,32,64,128
+   3. Convertir une image vers ICO uniquement:
+      seticon convert -i "./image.jpg" -o "./icone.ico"
+      seticon convert --icon "logo.svg" --output "logo.ico" --sizes 16,32,64,128
 
-   4. Syntaxe simplifiée (rétrocompatibilité):
+   4. Syntaxe simplifiée (arguments positionnels):
       seticon "./MonDossier" "./icone.png"
-      seticon convert "./image.png" "./icon.ico"
+      seticon convert "./image.bmp" "./icon.ico"
 
    5. Changer la langue (mémorisée pour les prochaines exécutions):
       seticon --lang fr
@@ -129,7 +129,7 @@ ${'='.repeat(34)}
 
 🔧 FONCTIONNALITÉS:
    ✓ Support cross-platform : Windows, macOS, Linux
-   ✓ Conversion PNG → ICO multi-tailles (Windows uniquement)
+   ✓ Conversion image → ICO multi-tailles (jpg, jpeg, bmp, tif, tiff, webp, svg)
    ✓ Détection automatique de l'environnement de bureau (GNOME/KDE)
    ✓ Cache d'icônes adressé par contenu avec déduplication
    ✓ Gestion d'erreurs complète
@@ -146,8 +146,8 @@ ${'='.repeat(34)}
    Linux    → gio set metadata::custom-icon (GNOME) + .directory (KDE)
 
 ⚠️  NOTES IMPORTANTES:
-   • Sur Windows, la conversion PNG → ICO est automatique si nécessaire
-   • Sur macOS/Linux, le PNG est utilisé directement (pas besoin d'ICO)
+   • PNG et ICO sont utilisés tels quels ; les autres formats sont convertis en ICO
+   • La conversion s'applique sur toutes les plateformes (l'ICO en cache est réutilisé)
    • macOS demandera une permission pour automatiser Finder au 1er lancement
    • Sur Linux, redémarre Nautilus (F5) si l'icône n'apparaît pas tout de suite
    • Linux/tmpfs (ex: /tmp) : gio metadata n'est pas supporté, seul .directory marche
