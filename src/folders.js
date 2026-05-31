@@ -7,7 +7,7 @@ export function getAssetsDir() {
     return path.join(__dirname, '..', 'assets');
 }
 
-// RGB tints used to recolor a monochrome overlay so it matches the folder hue.
+// RGB tints used to recolor an overlay so it matches the folder hue.
 export const ICON_COLOR = {
     'mac-os-default-dark': { r: 51, g: 157, b: 224 },
     'mac-os-default-light': { r: 63, g: 170, b: 230 },
@@ -29,7 +29,7 @@ const MAC_CONSTRAINTS = { maxWidth: 768, maxHeight: 384, preferredSize: 384, sta
 const WINDOWS_CONSTRAINTS = { maxWidth: 768, maxHeight: 384, preferredSize: 384, startY: 286, folderAreaHeight: 546 };
 const LINUX_CONSTRAINTS = { maxWidth: 520, maxHeight: 300, preferredSize: 300, startY: 360, folderAreaHeight: 360 };
 
-// Folder bases available per OS. `default` marks the variant used when none is given.
+// Folder bases available per OS. `defaultVariant` is used when none is given.
 export const OS_FOLDERS = {
     mac: {
         dir: 'mac-os',
@@ -69,26 +69,27 @@ export const OS_FOLDERS = {
 
 export const SUPPORTED_OS = Object.keys(OS_FOLDERS);
 
+// Map the running platform to a default folder look.
+export function detectOs() {
+    if (process.platform === 'win32') return 'windows';
+    if (process.platform === 'darwin') return 'mac';
+    return 'linux';
+}
+
 export function resolveBase(os, variant) {
     const entry = OS_FOLDERS[os];
     if (!entry) {
-        throw new Error(`Unsupported --os: ${os}. Supported: ${SUPPORTED_OS.join(', ')}`);
+        throw new Error(`Unsupported OS: ${os}. Supported: ${SUPPORTED_OS.join(', ')}`);
     }
     const variantKey = variant || entry.defaultVariant;
     const file = entry.variants[variantKey];
     if (!file) {
         const available = Object.keys(entry.variants).join(', ');
-        throw new Error(`Unsupported --variant "${variantKey}" for ${os}. Available: ${available}`);
+        throw new Error(`Unsupported variant "${variantKey}" for ${os}. Available: ${available}`);
     }
     return {
         filePath: path.join(getAssetsDir(), 'folders', entry.dir, `${file}.webp`),
         constraints: entry.constraints,
         colorKey: file,
     };
-}
-
-// Resolve a built-in overlay name (e.g. "js") to its bundled svg, else null.
-export function resolveBuiltinOverlay(name) {
-    if (!name) return null;
-    return path.join(getAssetsDir(), 'icons', `${name}.svg`);
 }

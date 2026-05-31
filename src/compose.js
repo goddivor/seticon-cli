@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { ICON_COLOR, resolveBase, resolveBuiltinOverlay } from './folders.js';
+import { ICON_COLOR, resolveBase } from './folders.js';
 
 const CANVAS = 1024;
 
@@ -44,15 +44,13 @@ async function recolorOverlay(sharp, buffer, color) {
 }
 
 async function loadOverlaySource(overlay) {
-    const builtin = resolveBuiltinOverlay(overlay);
-    if (builtin && fs.existsSync(builtin)) return builtin;
     const asFile = path.resolve(overlay);
     if (fs.existsSync(asFile)) return asFile;
-    throw new Error(`Overlay not found: ${overlay} (not a built-in icon nor an existing file)`);
+    throw new Error(`Overlay image not found: ${overlay}`);
 }
 
 /**
- * Compose a folder icon: base folder + optional overlay (built-in name or file),
+ * Compose a folder icon: base folder + optional overlay image (user file),
  * recolored to match the variant when adjustColor is set.
  * Returns a PNG buffer (1024x1024).
  */

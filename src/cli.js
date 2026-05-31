@@ -2,6 +2,9 @@ import { SUPPORTED_LANGUAGES, loadConfig, saveConfig } from './config.js';
 import { showHelp } from './help.js';
 import { processIconChange } from './icon.js';
 import { convertToIco } from './convert.js';
+import { processOverlayIcon } from './overlay.js';
+
+const ZOOM_LEVELS = { 75: 0.75, 92: 0.92, 108: 1.08, 125: 1.25, 100: 1 };
 
 export function parseArguments(args) {
     const options = {
@@ -12,7 +15,12 @@ export function parseArguments(args) {
         sizes: [16, 32, 48, 64, 128, 256],
         verbose: false,
         help: false,
-        lang: null
+        lang: null,
+        overlay: false,
+        os: null,
+        variant: null,
+        iconColor: 'original',
+        zoom: 1
     };
 
     for (let i = 0; i < args.length; i++) {
@@ -51,6 +59,33 @@ export function parseArguments(args) {
             case '-l':
                 if (nextArg) {
                     options.lang = nextArg.toLowerCase();
+                    i++;
+                }
+                break;
+            case '--overlay':
+                options.overlay = true;
+                break;
+            case '--os':
+                if (nextArg) {
+                    options.os = nextArg.toLowerCase();
+                    i++;
+                }
+                break;
+            case '--variant':
+                if (nextArg) {
+                    options.variant = nextArg.toLowerCase();
+                    i++;
+                }
+                break;
+            case '--icon-color':
+                if (nextArg) {
+                    options.iconColor = nextArg.toLowerCase();
+                    i++;
+                }
+                break;
+            case '--zoom':
+                if (nextArg) {
+                    options.zoom = ZOOM_LEVELS[nextArg.replace('%', '')] || 1;
                     i++;
                 }
                 break;
@@ -133,6 +168,26 @@ export async function main() {
             console.log(`✓ Image converted to ICO: ${options.output}`);
 
         } else if (options.command === 'set') {
+            if (options.overlay) {
+                if (!options.icon || (!options.folder && !options.output)) {
+                    console.error('❌ Overlay mode requires --icon and either --folder or --output');
+                    console.log('💡 Example: seticon set -f "./MyFolder" -i "logo.png" --overlay --os mac --variant blue');
+                    process.exit(1);
+                }
+
+                const success = await processOverlayIcon({
+                    folder: options.folder,
+                    output: options.output,
+                    image: options.icon,
+                    os: options.os,
+                    variant: options.variant,
+                    iconColor: options.iconColor,
+                    zoom: options.zoom,
+                    sizes: options.sizes
+                });
+                process.exit(success ? 0 : 1);
+            }
+
             if (!options.folder || !options.icon) {
                 console.error('❌ Set command requires --folder and --icon parameters');
                 console.log('💡 Example: seticon set -f "./MyFolder" -i "icon.png"');

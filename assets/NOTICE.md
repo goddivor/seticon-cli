@@ -14,9 +14,3 @@ These reproduce the look of Apple macOS and Microsoft Windows 11 folder icons.
 Apple and Microsoft retain all rights to their respective designs and trademarks.
 They are bundled here only to let users recreate the native folder look for
 personal use. They are not covered by this project's MIT license.
-
-## Overlay icons (`icons/*.svg`)
-
-Brand logos (JavaScript, React, Git, GitHub, Figma, Next.js, Tailwind,
-TypeScript, Vercel, VS Code, Apple). Each trademark belongs to its respective
-owner; provided as convenience overlays only.
