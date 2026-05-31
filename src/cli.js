@@ -118,14 +118,14 @@ export async function main() {
     try {
         if (options.command === 'convert') {
             if (args[0] === 'convert' && args.length === 3) {
-                const [, pngPath, icoPath] = args;
-                options.icon = pngPath;
+                const [, imagePath, icoPath] = args;
+                options.icon = imagePath;
                 options.output = icoPath;
             }
 
             if (!options.icon || !options.output) {
                 console.error('❌ Convert command requires --icon and --output parameters');
-                console.log('💡 Example: seticon convert -i "image.png" -o "icon.ico"');
+                console.log('💡 Example: seticon convert -i "image.jpg" -o "icon.ico"');
                 process.exit(1);
             }
 

@@ -35,9 +35,9 @@ function setFolderIcon(folderPath, iconPath) {
     }
 }
 
-export async function processIconChange(folderPath, iconOrPngPath, dimensions = [16, 32, 48, 64, 128, 256]) {
+export async function processIconChange(folderPath, iconOrImagePath, dimensions = [16, 32, 48, 64, 128, 256]) {
     try {
-        const ext = path.extname(iconOrPngPath).toLowerCase();
+        const ext = path.extname(iconOrImagePath).toLowerCase();
 
         if (!SUPPORTED_FORMATS.includes(ext)) {
             throw new Error(`Unsupported icon format: ${ext}. Supported: ${SUPPORTED_FORMATS.join(', ')}`);
@@ -45,7 +45,7 @@ export async function processIconChange(folderPath, iconOrPngPath, dimensions = 
 
         const needsConversion = !NO_CONVERSION_FORMATS.includes(ext);
 
-        const { storePath, storeId } = await resolveStoredIcon(iconOrPngPath, needsConversion, dimensions);
+        const { storePath, storeId } = await resolveStoredIcon(iconOrImagePath, needsConversion, dimensions);
 
         setFolderIcon(folderPath, storePath);
         trackUsage(storeId, path.resolve(folderPath));
