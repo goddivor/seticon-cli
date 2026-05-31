@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { ICON_COLOR, resolveBase, resolveLinuxFolder, resolveColor } from './folders.js';
+import { ICON_COLOR, resolveBase, resolveLinuxFolder, resolveColor, hexToRgb } from './folders.js';
 
 const CANVAS = 1024;
 
@@ -65,7 +65,7 @@ async function resolveBaseBuffer(sharp, os, variant) {
         if (color) {
             pipeline = pipeline.tint(color);
         }
-        return { baseBuffer: await pipeline.png().toBuffer(), constraints, colorKey: null };
+        return { baseBuffer: await pipeline.png().toBuffer(), constraints, tint: hexToRgb(color) };
     }
 
     const { filePath, constraints, colorKey } = resolveBase(os, variant);
@@ -73,7 +73,7 @@ async function resolveBaseBuffer(sharp, os, variant) {
         throw new Error(`Folder base asset missing: ${filePath}`);
     }
     const baseBuffer = await sharp(filePath).resize(CANVAS, CANVAS, { fit: 'fill' }).png().toBuffer();
-    return { baseBuffer, constraints, colorKey };
+    return { baseBuffer, constraints, tint: ICON_COLOR[colorKey] || null };
 }
 
 /**
@@ -81,13 +81,13 @@ async function resolveBaseBuffer(sharp, os, variant) {
  * - os: 'mac' | 'windows' | 'linux'
  * - variant: variant name (mac/win) or color preset/hex (linux base tint)
  * - overlay: path to a user image (or null for the bare base)
- * - adjustColor: recolor the overlay to match the variant hue (mac/win only)
+ * - adjustColor: recolor the overlay to match the variant/color (all OSes)
  * - scale: overlay zoom factor
  * Returns a PNG buffer (1024x1024).
  */
 export async function composeFolderIcon({ os, variant, overlay, adjustColor = false, scale = 1 }) {
     const { default: sharp } = await import('sharp');
-    const { baseBuffer, constraints, colorKey } = await resolveBaseBuffer(sharp, os, variant);
+    const { baseBuffer, constraints, tint } = await resolveBaseBuffer(sharp, os, variant);
 
     if (!overlay) {
         return sharp(baseBuffer).png().toBuffer();
@@ -113,8 +113,8 @@ export async function composeFolderIcon({ os, variant, overlay, adjustColor = fa
         .png()
         .toBuffer();
 
-    if (adjustColor && colorKey && ICON_COLOR[colorKey]) {
-        overlayBuf = await recolorOverlay(sharp, overlayBuf, ICON_COLOR[colorKey]);
+    if (adjustColor && tint) {
+        overlayBuf = await recolorOverlay(sharp, overlayBuf, tint);
     }
 
     const top = Math.round(constraints.startY + constraints.folderAreaHeight / 2 - dim.height / 2);

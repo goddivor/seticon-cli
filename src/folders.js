@@ -34,6 +34,15 @@ export function resolveColor(token) {
     return null;
 }
 
+// Convert a #rgb / #rrggbb hex string to an { r, g, b } object.
+export function hexToRgb(hex) {
+    if (!hex) return null;
+    let h = hex.replace('#', '');
+    if (h.length === 3) h = h.split('').map((c) => c + c).join('');
+    const n = parseInt(h, 16);
+    return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 };
+}
+
 // RGB tints used to recolor an overlay so it matches the folder hue.
 export const ICON_COLOR = {
     'mac-os-default-dark': { r: 51, g: 157, b: 224 },
