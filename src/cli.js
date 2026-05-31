@@ -1,7 +1,7 @@
 import { SUPPORTED_LANGUAGES, loadConfig, saveConfig } from './config.js';
 import { showHelp } from './help.js';
 import { processIconChange } from './icon.js';
-import { convertPngToIco } from './convert.js';
+import { convertToIco } from './convert.js';
 
 export function parseArguments(args) {
     const options = {
@@ -118,19 +118,19 @@ export async function main() {
     try {
         if (options.command === 'convert') {
             if (args[0] === 'convert' && args.length === 3) {
-                const [, pngPath, icoPath] = args;
-                options.icon = pngPath;
+                const [, imagePath, icoPath] = args;
+                options.icon = imagePath;
                 options.output = icoPath;
             }
 
             if (!options.icon || !options.output) {
                 console.error('❌ Convert command requires --icon and --output parameters');
-                console.log('💡 Example: seticon convert -i "image.png" -o "icon.ico"');
+                console.log('💡 Example: seticon convert -i "image.jpg" -o "icon.ico"');
                 process.exit(1);
             }
 
-            await convertPngToIco(options.icon, options.output, options.sizes);
-            console.log(`✓ PNG converted to ICO: ${options.output}`);
+            await convertToIco(options.icon, options.output, options.sizes);
+            console.log(`✓ Image converted to ICO: ${options.output}`);
 
         } else if (options.command === 'set') {
             if (!options.folder || !options.icon) {

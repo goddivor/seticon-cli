@@ -50,6 +50,7 @@
     "linux"
   ],
   "dependencies": {
+    "decode-bmp": "^0.2.1",
     "png-to-ico": "^3.0.1",
     "sharp": "^0.34.5"
   }

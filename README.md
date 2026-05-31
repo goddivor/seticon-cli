@@ -16,17 +16,18 @@
 
 Cross-platform CLI to change folder icons on **Windows**, **macOS** and **Linux**.
 
-Automatically converts PNG icons to multi-size ICO on Windows, and uses the
-right mechanism for each desktop environment elsewhere.
+Accepts common image formats and automatically converts them to a multi-size
+ICO, then applies the icon using the right mechanism for each desktop environment.
 
 </div>
 
 ## 🎖️ Features
 
 - **Cross-platform** — Windows, macOS, Linux (GNOME and KDE)
-- **PNG → ICO conversion** built in (multi-size: 16, 32, 48, 64, 128, 256)
+- **Many input formats** — `ico`, `png`, `jpg`, `jpeg`, `bmp`, `tif`, `tiff`, `webp`, `svg`
+- **Automatic ICO conversion** built in (multi-size: 16, 32, 48, 64, 128, 256); `png` and `ico` are used as-is
+- **Content-addressed icon cache** with deduplication (same image reused, never re-converted)
 - **No admin / sudo required** for the icon change itself
-- **Native icon format support** on macOS and Linux (PNG, JPG, SVG, ICO)
 - **Detects the OS** and applies the correct mechanism automatically:
   - Windows → `desktop.ini` + `attrib +H +S +R`
   - macOS   → `NSWorkspace.setIcon` via `osascript` (Finder)
@@ -68,18 +69,19 @@ pnpm add -g seticon-cli
 ## ⚙️ Usage
 
 ```bash
-# Set a folder icon (auto-converts PNG → ICO on Windows)
+# Set a folder icon (any image is auto-converted to ICO)
 seticon set -f "./MyFolder" -i "./icon.png"
+seticon set -f "./MyFolder" -i "./photo.webp"
 
 # Shorthand: positional arguments, no flags needed
 seticon "./MyFolder" "./icon.png"
-seticon convert "./image.png" "./icon.ico"
+seticon convert "./image.jpg" "./icon.ico"
 
 # Long options also work
-seticon set --folder "Documents" --icon "logo.ico"
+seticon set --folder "Documents" --icon "logo.svg"
 
-# Convert PNG to ICO without setting an icon
-seticon convert -i "./image.png" -o "./icon.ico"
+# Convert an image to ICO without setting an icon
+seticon convert -i "./image.bmp" -o "./icon.ico"
 
 # Pick specific sizes for the ICO output
 seticon convert --icon "photo.png" --output "icon.ico" --sizes 16,32,48
@@ -92,13 +94,23 @@ seticon --lang fr
 seticon -l en
 ```
 
-### 🖼️ Supported icon formats per OS
+### 🖼️ Supported formats
 
-| OS      | Formats accepted               | Notes                                                |
-| ------- | ------------------------------ | ---------------------------------------------------- |
-| Windows | `.ico` (PNG auto-converted)    | `desktop.ini` written + folder marked system/hidden  |
-| macOS   | `.png` / `.jpg` / `.tiff` / `.icns` | Asks for Finder automation permission on first run |
-| Linux   | `.png` / `.jpg` / `.svg` / `.ico` | GNOME via `gio`, KDE via `.directory`              |
+| Input format                          | Behavior              |
+| ------------------------------------- | --------------------- |
+| `png`, `ico`                          | used as-is            |
+| `jpg`, `jpeg`, `bmp`, `tif`, `tiff`, `webp`, `svg` | auto-converted to a multi-size `ico` |
+
+Converted icons are stored once in a content-addressed cache and reused for
+identical images, so the same picture is never converted twice.
+
+### 🖥️ How the icon is applied per OS
+
+| OS      | Mechanism                                                            |
+| ------- | ------------------------------------------------------------------- |
+| Windows | `desktop.ini` (absolute `IconResource`) + `attrib +H +S +R`         |
+| macOS   | `NSWorkspace.setIcon` via `osascript` (Finder permission on 1st run) |
+| Linux   | `gio set metadata::custom-icon` (GNOME) + `.directory` file (KDE)    |
 
 ## 🤝 Contributing
 
