@@ -119,19 +119,15 @@ export function parseArguments(args) {
                 options.command = arg;
                 break;
             default:
+                // Positional shorthand: `seticon "./folder" ["./icon"]`.
+                // Only consume the next token as the icon when it is not a flag,
+                // so options like --text are not mistaken for the image.
                 if (!arg.startsWith('-') && !options.command) {
-                    if (args.length >= 2 && !options.folder) {
-                        options.command = 'set';
-                        options.folder = arg;
+                    options.command = 'set';
+                    options.folder = arg;
+                    if (nextArg && !nextArg.startsWith('-')) {
                         options.icon = nextArg;
                         i++;
-                    } else if (arg === 'convert' || (args.length === 3 && !options.command)) {
-                        options.command = 'convert';
-                        if (arg !== 'convert') {
-                            options.icon = arg;
-                            options.output = nextArg;
-                            i++;
-                        }
                     }
                 }
                 break;
