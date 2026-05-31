@@ -57,7 +57,6 @@ export const ICON_COLOR = {
     'mac-os-black': { r: 17, g: 17, b: 17 },
     'windows-11-default': { r: 180, g: 126, b: 1 },
     'windows-11-pink': { r: 201, g: 84, b: 122 },
-    'linux-adwaita': { r: 255, g: 255, b: 255 },
 };
 
 // Placement constraints (canvas is 1024x1024), ported from FolderArt.
@@ -93,17 +92,10 @@ export const OS_FOLDERS = {
             pink: 'windows-11-pink',
         },
     },
-    linux: {
-        dir: 'linux',
-        constraints: LINUX_CONSTRAINTS,
-        defaultVariant: 'adwaita',
-        variants: {
-            adwaita: 'linux-adwaita',
-        },
-    },
 };
 
-export const SUPPORTED_OS = Object.keys(OS_FOLDERS);
+// linux is supported via the machine's icon theme (not via OS_FOLDERS assets).
+export const SUPPORTED_OS = [...Object.keys(OS_FOLDERS), 'linux'];
 
 // Map the running platform to a default folder look.
 export function detectOs() {
