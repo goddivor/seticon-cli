@@ -126,6 +126,10 @@ seticon set -f "./Photos" -i "cam.png" -ov -va "#e67e22"
 > Yaru, Breeze…) — nothing is bundled. On **macOS/Windows**, bundled folder
 > looks are used.
 
+> 💡 Overlay mode is inspired by and credits
+> [**FolderArt** by christianvmm](https://github.com/christianvmm/folderart),
+> whose folder designs and approach this feature builds upon.
+
 ### 🖼️ Supported formats
 
 | Input format                          | Behavior              |
