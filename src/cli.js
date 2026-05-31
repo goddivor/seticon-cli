@@ -1,7 +1,7 @@
 import { SUPPORTED_LANGUAGES, loadConfig, saveConfig } from './config.js';
 import { showHelp } from './help.js';
 import { processIconChange } from './icon.js';
-import { convertPngToIco } from './convert.js';
+import { convertToIco } from './convert.js';
 
 export function parseArguments(args) {
     const options = {
@@ -129,8 +129,8 @@ export async function main() {
                 process.exit(1);
             }
 
-            await convertPngToIco(options.icon, options.output, options.sizes);
-            console.log(`✓ PNG converted to ICO: ${options.output}`);
+            await convertToIco(options.icon, options.output, options.sizes);
+            console.log(`✓ Image converted to ICO: ${options.output}`);
 
         } else if (options.command === 'set') {
             if (!options.folder || !options.icon) {

@@ -21,7 +21,7 @@ ${'='.repeat(34)}
 
 ⚙️  MAIN OPTIONS:
    -f, --folder <path>     Target folder path
-   -i, --icon <path>       Icon file path (.ico or .png)
+   -i, --icon <path>       Icon/image path (ico, png, jpg, bmp, tif, webp, svg)
    -o, --output <path>     Output file for conversion
    -s, --sizes <sizes>     Icon sizes (e.g. 16,32,48,64,128,256)
    -l, --lang <code>       Set and remember the interface language (en, fr)
@@ -58,9 +58,9 @@ ${'='.repeat(34)}
    ✓ Comprehensive error handling
 
 📁 SUPPORTED FORMATS:
-   Input (Windows): PNG, ICO
-   Input (macOS):   PNG, JPG, ICNS, GIF, TIFF, BMP, ICO
-   Input (Linux):   PNG, JPG, SVG, ICO, GIF, TIFF, BMP
+   Input:           ICO, PNG, JPG, JPEG, BMP, TIF, TIFF, WEBP, SVG
+   Kept as-is:      PNG, ICO
+   Auto-converted:  JPG, JPEG, BMP, TIF, TIFF, WEBP, SVG → ICO
    Convert output:  ICO (16, 32, 48, 64, 128, 256 px)
 
 🖥️  PER-PLATFORM BEHAVIOR:
@@ -98,7 +98,7 @@ ${'='.repeat(34)}
 
 ⚙️  OPTIONS PRINCIPALES:
    -f, --folder <path>     Chemin du dossier cible
-   -i, --icon <path>       Chemin du fichier icône (.ico ou .png)
+   -i, --icon <path>       Chemin de l'icône/image (ico, png, jpg, bmp, tif, webp, svg)
    -o, --output <path>     Fichier de sortie pour conversion
    -s, --sizes <sizes>     Tailles d'icône (ex: 16,32,48,64,128,256)
    -l, --lang <code>       Définir et mémoriser la langue de l'interface (en, fr)
@@ -135,10 +135,10 @@ ${'='.repeat(34)}
    ✓ Gestion d'erreurs complète
 
 📁 FORMATS SUPPORTÉS:
-   Entrée (Windows): PNG, ICO
-   Entrée (macOS):   PNG, JPG, ICNS, GIF, TIFF, BMP, ICO
-   Entrée (Linux):   PNG, JPG, SVG, ICO, GIF, TIFF, BMP
-   Sortie convert:   ICO (16, 32, 48, 64, 128, 256 px)
+   Entrée :          ICO, PNG, JPG, JPEG, BMP, TIF, TIFF, WEBP, SVG
+   Gardés tels quels: PNG, ICO
+   Convertis auto :  JPG, JPEG, BMP, TIF, TIFF, WEBP, SVG → ICO
+   Sortie convert :  ICO (16, 32, 48, 64, 128, 256 px)
 
 🖥️  COMPORTEMENT PAR PLATEFORME:
    Windows  → Crée desktop.ini + applique attributs +H +S +R

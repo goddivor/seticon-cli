@@ -5,7 +5,8 @@ import { setFolderIconWindows } from './platforms/windows.js';
 import { setFolderIconMacOS } from './platforms/macos.js';
 import { setFolderIconLinux } from './platforms/linux.js';
 
-const NON_WINDOWS_FORMATS = ['.png', '.jpg', '.jpeg', '.ico', '.icns', '.gif', '.tiff', '.bmp', '.svg'];
+const SUPPORTED_FORMATS = ['.ico', '.jpg', '.jpeg', '.bmp', '.png', '.tif', '.tiff', '.webp', '.svg'];
+const NO_CONVERSION_FORMATS = ['.png', '.ico'];
 
 function setFolderIcon(folderPath, iconPath) {
     const absoluteFolderPath = path.resolve(folderPath);
@@ -37,17 +38,12 @@ function setFolderIcon(folderPath, iconPath) {
 export async function processIconChange(folderPath, iconOrPngPath, dimensions = [16, 32, 48, 64, 128, 256]) {
     try {
         const ext = path.extname(iconOrPngPath).toLowerCase();
-        let needsConversion = false;
 
-        if (process.platform === 'win32') {
-            if (ext === '.png') {
-                needsConversion = true;
-            } else if (ext !== '.ico') {
-                throw new Error('On Windows, icon must be .ico or .png');
-            }
-        } else if (!NON_WINDOWS_FORMATS.includes(ext)) {
-            throw new Error(`Unsupported icon format on ${process.platform}: ${ext}`);
+        if (!SUPPORTED_FORMATS.includes(ext)) {
+            throw new Error(`Unsupported icon format: ${ext}. Supported: ${SUPPORTED_FORMATS.join(', ')}`);
         }
+
+        const needsConversion = !NO_CONVERSION_FORMATS.includes(ext);
 
         const { storePath, storeId } = await resolveStoredIcon(iconOrPngPath, needsConversion, dimensions);
 
