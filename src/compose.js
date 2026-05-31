@@ -48,6 +48,25 @@ async function loadOverlaySource(overlay) {
     throw new Error(`Overlay image not found: ${overlay}`);
 }
 
+// Average color of the visible (opaque) pixels of a PNG buffer.
+async function dominantColor(sharp, buffer) {
+    const { data, info } = await sharp(buffer).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+    let r = 0;
+    let g = 0;
+    let b = 0;
+    let n = 0;
+    for (let i = 0; i < data.length; i += info.channels) {
+        if (data[i + 3] > 128) {
+            r += data[i];
+            g += data[i + 1];
+            b += data[i + 2];
+            n++;
+        }
+    }
+    if (!n) return null;
+    return { r: Math.round(r / n), g: Math.round(g / n), b: Math.round(b / n) };
+}
+
 // Resolve the folder base into a 1024 PNG buffer + placement constraints.
 // - linux: read the machine's current theme folder icon; tint it if a color is given.
 // - mac/windows: use the bundled pre-rendered variant.
@@ -65,7 +84,10 @@ async function resolveBaseBuffer(sharp, os, variant) {
         if (color) {
             pipeline = pipeline.tint(color);
         }
-        return { baseBuffer: await pipeline.png().toBuffer(), constraints, tint: hexToRgb(color) };
+        const baseBuffer = await pipeline.png().toBuffer();
+        // Tint for the overlay: the chosen color, or the theme icon's own color.
+        const tint = color ? hexToRgb(color) : await dominantColor(sharp, baseBuffer);
+        return { baseBuffer, constraints, tint };
     }
 
     const { filePath, constraints, colorKey } = resolveBase(os, variant);
