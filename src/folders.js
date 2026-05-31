@@ -1,10 +1,37 @@
+import fs from 'fs';
 import path from 'path';
+import { execSync } from 'child_process';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export function getAssetsDir() {
     return path.join(__dirname, '..', 'assets');
+}
+
+// FolderArt-style named color presets (absolute hex, applied via tint).
+export const COLOR_PRESETS = {
+    blue: '#3399e0',
+    green: '#18ab68',
+    lime: '#3aad4b',
+    yellow: '#caa41b',
+    orange: '#cd6f04',
+    red: '#ce2d24',
+    purple: '#833f9d',
+    gray: '#666666',
+    black: '#111111',
+    pink: '#c9547a',
+};
+
+// Resolve a variant token to a hex color: a preset name or a raw hex (#rgb/#rrggbb).
+export function resolveColor(token) {
+    if (!token) return null;
+    const key = token.toLowerCase();
+    if (COLOR_PRESETS[key]) return COLOR_PRESETS[key];
+    if (/^#?[0-9a-f]{3}$|^#?[0-9a-f]{6}$/i.test(token)) {
+        return token.startsWith('#') ? token : `#${token}`;
+    }
+    return null;
 }
 
 // RGB tints used to recolor an overlay so it matches the folder hue.
@@ -74,6 +101,81 @@ export function detectOs() {
     if (process.platform === 'win32') return 'windows';
     if (process.platform === 'darwin') return 'mac';
     return 'linux';
+}
+
+const ICON_THEME_DIRS = [
+    '/usr/share/icons',
+    process.env.HOME ? path.join(process.env.HOME, '.local', 'share', 'icons') : null,
+    process.env.HOME ? path.join(process.env.HOME, '.icons') : null,
+].filter(Boolean);
+
+function currentLinuxIconTheme() {
+    try {
+        const out = execSync('gsettings get org.gnome.desktop.interface icon-theme', { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
+        return out.trim().replace(/^'|'$/g, '');
+    } catch {
+        return 'hicolor';
+    }
+}
+
+function themeDir(theme) {
+    for (const base of ICON_THEME_DIRS) {
+        const d = path.join(base, theme);
+        if (fs.existsSync(path.join(d, 'index.theme'))) return d;
+    }
+    return null;
+}
+
+function themeInherits(theme) {
+    const d = themeDir(theme);
+    if (!d) return [];
+    try {
+        const idx = fs.readFileSync(path.join(d, 'index.theme'), 'utf8');
+        const m = idx.match(/^Inherits=(.+)$/m);
+        return m ? m[1].split(',').map((s) => s.trim()) : [];
+    } catch {
+        return [];
+    }
+}
+
+// Largest places/folder.{svg,png} within one theme (svg preferred).
+function findFolderInTheme(theme) {
+    const d = themeDir(theme);
+    if (!d) return null;
+    let best = null;
+    let bestScore = 0;
+    const stack = [d];
+    while (stack.length) {
+        const cur = stack.pop();
+        let entries;
+        try { entries = fs.readdirSync(cur, { withFileTypes: true }); } catch { continue; }
+        for (const e of entries) {
+            const p = path.join(cur, e.name);
+            if (e.isDirectory()) { stack.push(p); continue; }
+            if (!p.includes('places')) continue;
+            if (e.name === 'folder.svg') return p;
+            if (e.name === 'folder.png') {
+                const m = p.match(/(\d+)x\d+/);
+                const score = (m ? Number(m[1]) : 0) * (p.includes('@2x') ? 2 : 1);
+                if (score > bestScore) { bestScore = score; best = p; }
+            }
+        }
+    }
+    return best;
+}
+
+// Resolve the running machine's folder icon (current theme + inheritance chain).
+export function resolveLinuxFolder() {
+    const theme = currentLinuxIconTheme();
+    const chain = [theme, ...themeInherits(theme), 'Adwaita', 'hicolor'];
+    const seen = new Set();
+    for (const t of chain) {
+        if (seen.has(t)) continue;
+        seen.add(t);
+        const file = findFolderInTheme(t);
+        if (file) return { filePath: file, theme: t, constraints: LINUX_CONSTRAINTS };
+    }
+    throw new Error('No folder icon found in the current icon theme. Install an icon theme (e.g. Adwaita).');
 }
 
 export function resolveBase(os, variant) {

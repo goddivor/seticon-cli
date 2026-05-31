@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { ICON_COLOR, resolveBase } from './folders.js';
+import { ICON_COLOR, resolveBase, resolveLinuxFolder, resolveColor } from './folders.js';
 
 const CANVAS = 1024;
 
@@ -30,8 +30,7 @@ function fitOverlay(width, height, c) {
 
 // Recolor every visible pixel to a flat tint (like FolderArt's adjustIconColor).
 async function recolorOverlay(sharp, buffer, color) {
-    const img = sharp(buffer).ensureAlpha();
-    const { data, info } = await img.raw().toBuffer({ resolveWithObject: true });
+    const { data, info } = await sharp(buffer).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
     for (let i = 0; i < data.length; i += 4) {
         data[i] = color.r;
         data[i + 1] = color.g;
@@ -49,30 +48,55 @@ async function loadOverlaySource(overlay) {
     throw new Error(`Overlay image not found: ${overlay}`);
 }
 
+// Resolve the folder base into a 1024 PNG buffer + placement constraints.
+// - linux: read the machine's current theme folder icon; tint it if a color is given.
+// - mac/windows: use the bundled pre-rendered variant.
+async function resolveBaseBuffer(sharp, os, variant) {
+    if (os === 'linux') {
+        const { filePath, constraints } = resolveLinuxFolder();
+        if (!fs.existsSync(filePath)) {
+            throw new Error(`Folder icon not found: ${filePath}`);
+        }
+        const isSvg = path.extname(filePath).toLowerCase() === '.svg';
+        let pipeline = sharp(filePath, isSvg ? { density: 384 } : undefined)
+            .resize(CANVAS, CANVAS, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } });
+
+        const color = resolveColor(variant);
+        if (color) {
+            pipeline = pipeline.tint(color);
+        }
+        return { baseBuffer: await pipeline.png().toBuffer(), constraints, colorKey: null };
+    }
+
+    const { filePath, constraints, colorKey } = resolveBase(os, variant);
+    if (!fs.existsSync(filePath)) {
+        throw new Error(`Folder base asset missing: ${filePath}`);
+    }
+    const baseBuffer = await sharp(filePath).resize(CANVAS, CANVAS, { fit: 'fill' }).png().toBuffer();
+    return { baseBuffer, constraints, colorKey };
+}
+
 /**
- * Compose a folder icon: base folder + optional overlay image (user file),
- * recolored to match the variant when adjustColor is set.
+ * Compose a folder icon: folder base + optional overlay image laid on top.
+ * - os: 'mac' | 'windows' | 'linux'
+ * - variant: variant name (mac/win) or color preset/hex (linux base tint)
+ * - overlay: path to a user image (or null for the bare base)
+ * - adjustColor: recolor the overlay to match the variant hue (mac/win only)
+ * - scale: overlay zoom factor
  * Returns a PNG buffer (1024x1024).
  */
 export async function composeFolderIcon({ os, variant, overlay, adjustColor = false, scale = 1 }) {
     const { default: sharp } = await import('sharp');
-    const { filePath, constraints, colorKey } = resolveBase(os, variant);
-
-    if (!fs.existsSync(filePath)) {
-        throw new Error(`Folder base asset missing: ${filePath}`);
-    }
-
-    const base = sharp(filePath).resize(CANVAS, CANVAS, { fit: 'fill' });
+    const { baseBuffer, constraints, colorKey } = await resolveBaseBuffer(sharp, os, variant);
 
     if (!overlay) {
-        return base.png().toBuffer();
+        return sharp(baseBuffer).png().toBuffer();
     }
 
     const overlaySource = await loadOverlaySource(overlay);
-    const ext = path.extname(overlaySource).toLowerCase();
-    const density = ext === '.svg' ? 384 : undefined;
+    const isSvg = path.extname(overlaySource).toLowerCase() === '.svg';
 
-    let overlayBuf = await sharp(overlaySource, density ? { density } : undefined)
+    let overlayBuf = await sharp(overlaySource, isSvg ? { density: 384 } : undefined)
         .ensureAlpha()
         .toBuffer();
 
@@ -89,14 +113,14 @@ export async function composeFolderIcon({ os, variant, overlay, adjustColor = fa
         .png()
         .toBuffer();
 
-    if (adjustColor) {
+    if (adjustColor && colorKey && ICON_COLOR[colorKey]) {
         overlayBuf = await recolorOverlay(sharp, overlayBuf, ICON_COLOR[colorKey]);
     }
 
     const top = Math.round(constraints.startY + constraints.folderAreaHeight / 2 - dim.height / 2);
     const left = Math.round(CANVAS / 2 - dim.width / 2);
 
-    return base
+    return sharp(baseBuffer)
         .composite([{ input: overlayBuf, top, left }])
         .png()
         .toBuffer();
