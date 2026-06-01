@@ -85,3 +85,19 @@ export function trackUsage(storeId, folderAbs) {
     } catch {
     }
 }
+
+// Remove a folder from every icon's usedBy list (used by reset).
+export function untrackUsage(folderAbs) {
+    try {
+        const index = loadIndex();
+        let changed = false;
+        for (const id of Object.keys(index)) {
+            if (Array.isArray(index[id].usedBy) && index[id].usedBy.includes(folderAbs)) {
+                index[id].usedBy = index[id].usedBy.filter(f => f !== folderAbs);
+                changed = true;
+            }
+        }
+        if (changed) saveIndex(index);
+    } catch {
+    }
+}
