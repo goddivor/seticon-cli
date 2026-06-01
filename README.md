@@ -14,6 +14,11 @@
 [![Contributors](https://img.shields.io/github/contributors/goddivor/seticon-cli?logo=github&logoColor=fff&label=Contributors&labelColor=333&color=DB61A2&style=flat)](https://github.com/goddivor/seticon-cli/graphs/contributors)
 [![Open issues](https://img.shields.io/github/issues/goddivor/seticon-cli?logo=github&logoColor=fff&label=Issues&labelColor=333&color=3FB950&style=flat)](https://github.com/goddivor/seticon-cli/issues)
 
+[![sharp](https://img.shields.io/npm/v/sharp?logo=npm&logoColor=fff&label=sharp&labelColor=333&color=CB3837&style=flat)](https://www.npmjs.com/package/sharp)
+[![png-to-ico](https://img.shields.io/npm/v/png-to-ico?logo=npm&logoColor=fff&label=png-to-ico&labelColor=333&color=CB3837&style=flat)](https://www.npmjs.com/package/png-to-ico)
+[![decode-bmp](https://img.shields.io/npm/v/decode-bmp?logo=npm&logoColor=fff&label=decode-bmp&labelColor=333&color=CB3837&style=flat)](https://www.npmjs.com/package/decode-bmp)
+[![ico-extract](https://img.shields.io/npm/v/ico-extract?logo=npm&logoColor=fff&label=ico-extract&labelColor=333&color=CB3837&style=flat)](https://www.npmjs.com/package/ico-extract)
+
 Cross-platform CLI to change folder icons on **Windows**, **macOS** and **Linux**.
 
 Accepts common image formats and automatically converts them to a multi-size
@@ -40,13 +45,6 @@ ICO, then applies the icon using the right mechanism for each desktop environmen
 - Windows: works out of the box
 - macOS: Finder automation permission (prompted on first run)
 - Linux: `gio` (part of `glib2`, present by default on most distros)
-
-## 🧩 Built with
-
-[![sharp](https://img.shields.io/npm/v/sharp?logo=npm&logoColor=fff&label=sharp&labelColor=333&color=CB3837&style=flat)](https://www.npmjs.com/package/sharp)
-[![png-to-ico](https://img.shields.io/npm/v/png-to-ico?logo=npm&logoColor=fff&label=png-to-ico&labelColor=333&color=CB3837&style=flat)](https://www.npmjs.com/package/png-to-ico)
-[![decode-bmp](https://img.shields.io/npm/v/decode-bmp?logo=npm&logoColor=fff&label=decode-bmp&labelColor=333&color=CB3837&style=flat)](https://www.npmjs.com/package/decode-bmp)
-[![ico-extract](https://img.shields.io/npm/v/ico-extract?logo=npm&logoColor=fff&label=ico-extract&labelColor=333&color=CB3837&style=flat)](https://www.npmjs.com/package/ico-extract)
 
 ## 📦 Installation
 
