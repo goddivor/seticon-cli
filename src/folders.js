@@ -55,16 +55,15 @@ export const ICON_COLOR = {
     'mac-os-purple': { r: 131, g: 63, b: 157 },
     'mac-os-gray': { r: 102, g: 102, b: 102 },
     'mac-os-black': { r: 17, g: 17, b: 17 },
-    'windows-11-default': { r: 180, g: 126, b: 1 },
-    'windows-11-pink': { r: 201, g: 84, b: 122 },
 };
 
 // Placement constraints (canvas is 1024x1024), ported from FolderArt.
 const MAC_CONSTRAINTS = { maxWidth: 768, maxHeight: 384, preferredSize: 384, startY: 258, folderAreaHeight: 604 };
-const WINDOWS_CONSTRAINTS = { maxWidth: 768, maxHeight: 384, preferredSize: 384, startY: 286, folderAreaHeight: 546 };
+export const WINDOWS_CONSTRAINTS = { maxWidth: 768, maxHeight: 384, preferredSize: 384, startY: 286, folderAreaHeight: 546 };
 const LINUX_CONSTRAINTS = { maxWidth: 520, maxHeight: 300, preferredSize: 300, startY: 360, folderAreaHeight: 360 };
 
-// Folder bases available per OS. `defaultVariant` is used when none is given.
+// Bundled folder bases. Only macOS ships pre-rendered assets (used as the only
+// value --os can force). Windows reads the OS native icon, Linux the theme.
 export const OS_FOLDERS = {
     mac: {
         dir: 'mac-os',
@@ -83,19 +82,11 @@ export const OS_FOLDERS = {
             black: 'mac-os-black',
         },
     },
-    windows: {
-        dir: 'windows-11',
-        constraints: WINDOWS_CONSTRAINTS,
-        defaultVariant: 'default',
-        variants: {
-            default: 'windows-11-default',
-            pink: 'windows-11-pink',
-        },
-    },
 };
 
-// linux is supported via the machine's icon theme (not via OS_FOLDERS assets).
-export const SUPPORTED_OS = [...Object.keys(OS_FOLDERS), 'linux'];
+// Recognized OS values (auto-detected). Only `mac` may be forced via --os.
+export const SUPPORTED_OS = ['mac', 'windows', 'linux'];
+export const FORCEABLE_OS = ['mac'];
 
 // Map the running platform to a default folder look.
 export function detectOs() {

@@ -1,7 +1,7 @@
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
-import { detectOs } from './folders.js';
+import { detectOs, FORCEABLE_OS } from './folders.js';
 import { composeFolderIcon } from './compose.js';
 import { processIconChange } from './icon.js';
 import { convertToIco } from './convert.js';
@@ -12,7 +12,7 @@ import { convertToIco } from './convert.js';
  *
  * opts: { folder, output, image, os, variant, iconColor, zoom, sizes }
  *   - image: path to the user image to lay over the folder
- *   - os: 'mac' | 'windows' | 'linux' (defaults to the running platform)
+ *   - os: only 'mac' may be forced; otherwise the running platform is used
  *   - iconColor: 'original' (default) | 'variant'
  */
 export async function processOverlayIcon(opts) {
@@ -24,6 +24,9 @@ export async function processOverlayIcon(opts) {
     }
     if (!opts.folder && !opts.output) {
         throw new Error('Overlay mode requires either -f <folder> (apply) or -o <file> (save)');
+    }
+    if (opts.os && !FORCEABLE_OS.includes(opts.os)) {
+        throw new Error(`--os only accepts: ${FORCEABLE_OS.join(', ')}. Windows and Linux use the machine's own folder icon (auto-detected).`);
     }
 
     const osKey = opts.os || detectOs();
