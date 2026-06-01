@@ -3,6 +3,7 @@ import { showHelp } from './help.js';
 import { processIconChange } from './icon.js';
 import { convertToIco } from './convert.js';
 import { processOverlayIcon } from './overlay.js';
+import { resetFolderIcon } from './reset.js';
 
 const ZOOM_LEVELS = { 75: 0.75, 92: 0.92, 108: 1.08, 125: 1.25, 100: 1 };
 
@@ -23,6 +24,7 @@ export function parseArguments(args) {
         zoom: 1,
         text: null,
         textColor: null,
+        reset: false,
         unknownOption: false
     };
 
@@ -111,12 +113,17 @@ export function parseArguments(args) {
                     i++;
                 }
                 break;
+            case '--reset':
+            case '-r':
+                options.reset = true;
+                break;
             case '--verbose':
             case '-v':
                 options.verbose = true;
                 break;
             case 'set':
             case 'convert':
+            case 'reset':
                 options.command = arg;
                 break;
             default:
@@ -125,6 +132,11 @@ export function parseArguments(args) {
                     // typo like --ov instead of -ov).
                     console.error(`⚠️  Unknown option: ${arg}`);
                     options.unknownOption = true;
+                    break;
+                }
+                // Positional after `reset` is the target folder.
+                if (options.command === 'reset') {
+                    if (!options.folder) options.folder = arg;
                     break;
                 }
                 // Positional shorthand: `seticon "./folder" ["./icon"]`.
@@ -180,6 +192,18 @@ export async function main() {
     }
 
     try {
+        // Reset: `seticon reset <folder>`, or `-r/--reset` with a folder.
+        if (options.command === 'reset' || options.reset) {
+            const folder = options.folder || options.icon;
+            if (!folder) {
+                console.error('❌ Reset requires a folder');
+                console.log('💡 Example: seticon reset -f "./MyFolder"  (or: seticon "./MyFolder" -r)');
+                process.exit(1);
+            }
+            const ok = await resetFolderIcon(folder);
+            process.exit(ok ? 0 : 1);
+        }
+
         if (options.command === 'convert') {
             if (args[0] === 'convert' && args.length === 3) {
                 const [, imagePath, icoPath] = args;
