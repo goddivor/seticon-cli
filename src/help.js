@@ -28,6 +28,16 @@ ${'='.repeat(34)}
    -v, --verbose           Verbose mode
    -h, --help              Show this help
 
+🖼️  OVERLAY OPTIONS (lay the image over a folder base):
+   -ov, --overlay          Compose the image onto a folder instead of using it directly
+   -os, --os <name>        Folder style: mac, windows, linux (default: current OS)
+   -va, --variant <name|hex>  Folder color. mac/windows: a preset variant name;
+                           linux: a color preset (blue, green, red, ...) or #hex
+   -ic, --icon-color <mode>   original (keep image colors) or variant (tint to folder)
+   -t,  --text <text>      Draw text on the folder instead of an image
+   -tc, --text-color <hex>    Text color (default: the folder color)
+   -z,  --zoom <level>     Overlay size: 75, 92, 100, 108, 125
+
 📋 EXAMPLES:
 
    1. Set a folder icon from an ICO file:
@@ -46,7 +56,16 @@ ${'='.repeat(34)}
       seticon "./MyFolder" "./icon.png"
       seticon convert "./image.bmp" "./icon.ico"
 
-   5. Switch the language (remembered for next runs):
+   5. Lay an image over a folder (overlay mode):
+      seticon set -f "./MyFolder" -i "./logo.png" --overlay
+      seticon set -i "logo.svg" -o "icon.ico" --overlay --os mac --variant red
+      seticon set -f "./Dev" -i "js.png" --overlay --variant blue --icon-color variant --zoom 125
+
+   6. Draw text on a folder (overlay mode):
+      seticon set -f "./Work" --text "WORK" --overlay --variant blue
+      seticon set -f "./Docs" -t "DOCS" -ov -va red -tc "#ffffff"
+
+   7. Switch the language (remembered for next runs):
       seticon --lang fr
       seticon -l en
 
@@ -105,6 +124,16 @@ ${'='.repeat(34)}
    -v, --verbose          Mode verbeux
    -h, --help             Afficher l'aide
 
+🖼️  OPTIONS OVERLAY (poser l'image sur un dossier) :
+   -ov, --overlay          Composer l'image sur un dossier au lieu de l'utiliser telle quelle
+   -os, --os <nom>         Style de dossier : mac, windows, linux (défaut : OS courant)
+   -va, --variant <nom|hex>   Couleur du dossier. mac/windows : un nom de variante ;
+                           linux : un preset (blue, green, red, ...) ou #hex
+   -ic, --icon-color <mode>   original (garder les couleurs) ou variant (teinter au dossier)
+   -t,  --text <texte>     Écrire du texte sur le dossier au lieu d'une image
+   -tc, --text-color <hex>    Couleur du texte (défaut : la couleur du dossier)
+   -z,  --zoom <niveau>    Taille de l'overlay : 75, 92, 100, 108, 125
+
 📋 EXEMPLES D'UTILISATION:
 
    1. Changer l'icône d'un dossier avec un fichier ICO:
@@ -123,7 +152,16 @@ ${'='.repeat(34)}
       seticon "./MonDossier" "./icone.png"
       seticon convert "./image.bmp" "./icon.ico"
 
-   5. Changer la langue (mémorisée pour les prochaines exécutions):
+   5. Poser une image sur un dossier (mode overlay):
+      seticon set -f "./MonDossier" -i "./logo.png" --overlay
+      seticon set -i "logo.svg" -o "icon.ico" --overlay --os mac --variant red
+      seticon set -f "./Dev" -i "js.png" --overlay --variant blue --icon-color variant --zoom 125
+
+   6. Écrire du texte sur un dossier (mode overlay):
+      seticon set -f "./Travail" --text "WORK" --overlay --variant blue
+      seticon set -f "./Docs" -t "DOCS" -ov -va red -tc "#ffffff"
+
+   7. Changer la langue (mémorisée pour les prochaines exécutions):
       seticon --lang fr
       seticon -l en
 

@@ -6,7 +6,12 @@ import { setFolderIconMacOS } from './platforms/macos.js';
 import { setFolderIconLinux } from './platforms/linux.js';
 
 const SUPPORTED_FORMATS = ['.ico', '.jpg', '.jpeg', '.bmp', '.png', '.tif', '.tiff', '.webp', '.svg'];
-const NO_CONVERSION_FORMATS = ['.png', '.ico'];
+
+// Formats usable as-is (no ICO conversion). Windows only renders .ico from
+// desktop.ini, so there PNG must be converted too; macOS/Linux accept PNG.
+function noConversionFormats() {
+    return process.platform === 'win32' ? ['.ico'] : ['.png', '.ico'];
+}
 
 function setFolderIcon(folderPath, iconPath) {
     const absoluteFolderPath = path.resolve(folderPath);
@@ -43,7 +48,7 @@ export async function processIconChange(folderPath, iconOrImagePath, dimensions 
             throw new Error(`Unsupported icon format: ${ext}. Supported: ${SUPPORTED_FORMATS.join(', ')}`);
         }
 
-        const needsConversion = !NO_CONVERSION_FORMATS.includes(ext);
+        const needsConversion = !noConversionFormats().includes(ext);
 
         const { storePath, storeId } = await resolveStoredIcon(iconOrImagePath, needsConversion, dimensions);
 
