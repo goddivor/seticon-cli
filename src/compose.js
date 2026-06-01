@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { ICON_COLOR, resolveBase, resolveLinuxFolder, resolveColor, hexToRgb } from './folders.js';
+import { ICON_COLOR, OS_FOLDERS, resolveBase, resolveLinuxFolder, resolveColor, hexToRgb } from './folders.js';
 
 const CANVAS = 1024;
 
@@ -67,9 +67,24 @@ async function dominantColor(sharp, buffer) {
     return { r: Math.round(r / n), g: Math.round(g / n), b: Math.round(b / n) };
 }
 
+// Build a base from a raw folder-icon PNG buffer (linux theme / windows native):
+// fit to the canvas, tint if a color was requested, and pick the overlay tint.
+async function baseFromPng(sharp, pngBuffer, constraints, variant) {
+    const color = resolveColor(variant);
+    let pipeline = sharp(pngBuffer)
+        .resize(CANVAS, CANVAS, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } });
+    if (color) {
+        pipeline = pipeline.tint(color);
+    }
+    const baseBuffer = await pipeline.png().toBuffer();
+    const tint = color ? hexToRgb(color) : await dominantColor(sharp, baseBuffer);
+    return { baseBuffer, constraints, tint };
+}
+
 // Resolve the folder base into a 1024 PNG buffer + placement constraints.
-// - linux: read the machine's current theme folder icon; tint it if a color is given.
-// - mac/windows: use the bundled pre-rendered variant.
+// - linux: read the machine's current theme folder icon.
+// - windows (on a real Windows host): read the OS native folder icon (cached).
+// - otherwise (cross-OS look, or windows fallback): bundled pre-rendered variant.
 async function resolveBaseBuffer(sharp, os, variant) {
     if (os === 'linux') {
         const { filePath, constraints } = resolveLinuxFolder();
@@ -77,17 +92,17 @@ async function resolveBaseBuffer(sharp, os, variant) {
             throw new Error(`Folder icon not found: ${filePath}`);
         }
         const isSvg = path.extname(filePath).toLowerCase() === '.svg';
-        let pipeline = sharp(filePath, isSvg ? { density: 384 } : undefined)
-            .resize(CANVAS, CANVAS, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } });
+        const raw = await sharp(filePath, isSvg ? { density: 384 } : undefined).png().toBuffer();
+        return baseFromPng(sharp, raw, constraints, variant);
+    }
 
-        const color = resolveColor(variant);
-        if (color) {
-            pipeline = pipeline.tint(color);
+    if (os === 'windows' && process.platform === 'win32') {
+        const { getWindowsFolderIconPng } = await import('./system-icon.js');
+        const nativePng = await getWindowsFolderIconPng();
+        if (nativePng) {
+            return baseFromPng(sharp, nativePng, OS_FOLDERS.windows.constraints, variant);
         }
-        const baseBuffer = await pipeline.png().toBuffer();
-        // Tint for the overlay: the chosen color, or the theme icon's own color.
-        const tint = color ? hexToRgb(color) : await dominantColor(sharp, baseBuffer);
-        return { baseBuffer, constraints, tint };
+        // fall through to the bundled asset below
     }
 
     const { filePath, constraints, colorKey } = resolveBase(os, variant);
