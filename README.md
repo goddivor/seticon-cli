@@ -41,6 +41,13 @@ ICO, then applies the icon using the right mechanism for each desktop environmen
 - macOS: Finder automation permission (prompted on first run)
 - Linux: `gio` (part of `glib2`, present by default on most distros)
 
+## 🧩 Built with
+
+[![sharp](https://img.shields.io/npm/v/sharp?logo=npm&logoColor=fff&label=sharp&labelColor=333&color=CB3837&style=flat)](https://www.npmjs.com/package/sharp)
+[![png-to-ico](https://img.shields.io/npm/v/png-to-ico?logo=npm&logoColor=fff&label=png-to-ico&labelColor=333&color=CB3837&style=flat)](https://www.npmjs.com/package/png-to-ico)
+[![decode-bmp](https://img.shields.io/npm/v/decode-bmp?logo=npm&logoColor=fff&label=decode-bmp&labelColor=333&color=CB3837&style=flat)](https://www.npmjs.com/package/decode-bmp)
+[![ico-extract](https://img.shields.io/npm/v/ico-extract?logo=npm&logoColor=fff&label=ico-extract&labelColor=333&color=CB3837&style=flat)](https://www.npmjs.com/package/ico-extract)
+
 ## 📦 Installation
 
 ```bash
