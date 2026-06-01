@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { ICON_COLOR, OS_FOLDERS, resolveBase, resolveLinuxFolder, resolveColor, hexToRgb } from './folders.js';
+import { ICON_COLOR, WINDOWS_CONSTRAINTS, resolveBase, resolveLinuxFolder, resolveColor, hexToRgb } from './folders.js';
 
 const CANVAS = 1024;
 
@@ -96,13 +96,16 @@ async function resolveBaseBuffer(sharp, os, variant) {
         return baseFromPng(sharp, raw, constraints, variant);
     }
 
-    if (os === 'windows' && process.platform === 'win32') {
+    if (os === 'windows') {
+        if (process.platform !== 'win32') {
+            throw new Error('The Windows folder look is only available on Windows (it reads the OS native icon; there is no bundled Windows asset).');
+        }
         const { getWindowsFolderIconPng } = await import('./system-icon.js');
         const nativePng = await getWindowsFolderIconPng();
-        if (nativePng) {
-            return baseFromPng(sharp, nativePng, OS_FOLDERS.windows.constraints, variant);
+        if (!nativePng) {
+            throw new Error('Could not read the native Windows folder icon (imageres.dll.mun / shell32.dll).');
         }
-        // fall through to the bundled asset below
+        return baseFromPng(sharp, nativePng, WINDOWS_CONSTRAINTS, variant);
     }
 
     const { filePath, constraints, colorKey } = resolveBase(os, variant);
