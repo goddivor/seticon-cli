@@ -1,7 +1,11 @@
 import { SUPPORTED_LANGUAGES, loadConfig, saveConfig } from './config.js';
 import { showHelp } from './help.js';
 import { processIconChange } from './icon.js';
-import { convertPngToIco } from './convert.js';
+import { convertToIco } from './convert.js';
+import { processOverlayIcon } from './overlay.js';
+import { resetFolderIcon } from './reset.js';
+
+const ZOOM_LEVELS = { 75: 0.75, 92: 0.92, 108: 1.08, 125: 1.25, 100: 1 };
 
 export function parseArguments(args) {
     const options = {
@@ -12,7 +16,16 @@ export function parseArguments(args) {
         sizes: [16, 32, 48, 64, 128, 256],
         verbose: false,
         help: false,
-        lang: null
+        lang: null,
+        overlay: false,
+        os: null,
+        variant: null,
+        iconColor: 'original',
+        zoom: 1,
+        text: null,
+        textColor: null,
+        reset: false,
+        unknownOption: false
     };
 
     for (let i = 0; i < args.length; i++) {
@@ -54,28 +67,86 @@ export function parseArguments(args) {
                     i++;
                 }
                 break;
+            case '--overlay':
+            case '-ov':
+                options.overlay = true;
+                break;
+            case '--os':
+            case '-os':
+                if (nextArg) {
+                    options.os = nextArg.toLowerCase();
+                    i++;
+                }
+                break;
+            case '--variant':
+            case '-va':
+                if (nextArg) {
+                    options.variant = nextArg.toLowerCase();
+                    i++;
+                }
+                break;
+            case '--icon-color':
+            case '-ic':
+                if (nextArg) {
+                    options.iconColor = nextArg.toLowerCase();
+                    i++;
+                }
+                break;
+            case '--zoom':
+            case '-z':
+                if (nextArg) {
+                    options.zoom = ZOOM_LEVELS[nextArg.replace('%', '')] || 1;
+                    i++;
+                }
+                break;
+            case '--text':
+            case '-t':
+                if (nextArg !== undefined) {
+                    options.text = nextArg;
+                    i++;
+                }
+                break;
+            case '--text-color':
+            case '-tc':
+                if (nextArg) {
+                    options.textColor = nextArg;
+                    i++;
+                }
+                break;
+            case '--reset':
+            case '-r':
+                options.reset = true;
+                break;
             case '--verbose':
             case '-v':
                 options.verbose = true;
                 break;
             case 'set':
             case 'convert':
+            case 'reset':
                 options.command = arg;
                 break;
             default:
-                if (!arg.startsWith('-') && !options.command) {
-                    if (args.length >= 2 && !options.folder) {
-                        options.command = 'set';
-                        options.folder = arg;
+                if (arg.startsWith('-')) {
+                    // Unknown flag: warn instead of silently ignoring (e.g. a
+                    // typo like --ov instead of -ov).
+                    console.error(`⚠️  Unknown option: ${arg}`);
+                    options.unknownOption = true;
+                    break;
+                }
+                // Positional after `reset` is the target folder.
+                if (options.command === 'reset') {
+                    if (!options.folder) options.folder = arg;
+                    break;
+                }
+                // Positional shorthand: `seticon "./folder" ["./icon"]`.
+                // Only consume the next token as the icon when it is not a flag.
+                if (!options.command) {
+                    options.command = 'set';
+                    options.folder = arg;
+                    if (nextArg && !nextArg.startsWith('-')) {
                         options.icon = nextArg;
                         i++;
-                    } else if (arg === 'convert' || (args.length === 3 && !options.command)) {
-                        options.command = 'convert';
-                        if (arg !== 'convert') {
-                            options.icon = arg;
-                            options.output = nextArg;
-                            i++;
-                        }
                     }
                 }
                 break;
@@ -115,24 +186,64 @@ export async function main() {
         return;
     }
 
+    if (options.unknownOption) {
+        console.log('💡 Run "seticon --help" to see the available options.');
+        process.exit(1);
+    }
+
     try {
+        // Reset: `seticon reset <folder>`, or `-r/--reset` with a folder.
+        if (options.command === 'reset' || options.reset) {
+            const folder = options.folder || options.icon;
+            if (!folder) {
+                console.error('❌ Reset requires a folder');
+                console.log('💡 Example: seticon reset -f "./MyFolder"  (or: seticon "./MyFolder" -r)');
+                process.exit(1);
+            }
+            const ok = await resetFolderIcon(folder);
+            process.exit(ok ? 0 : 1);
+        }
+
         if (options.command === 'convert') {
             if (args[0] === 'convert' && args.length === 3) {
-                const [, pngPath, icoPath] = args;
-                options.icon = pngPath;
+                const [, imagePath, icoPath] = args;
+                options.icon = imagePath;
                 options.output = icoPath;
             }
 
             if (!options.icon || !options.output) {
                 console.error('❌ Convert command requires --icon and --output parameters');
-                console.log('💡 Example: seticon convert -i "image.png" -o "icon.ico"');
+                console.log('💡 Example: seticon convert -i "image.jpg" -o "icon.ico"');
                 process.exit(1);
             }
 
-            await convertPngToIco(options.icon, options.output, options.sizes);
-            console.log(`✓ PNG converted to ICO: ${options.output}`);
+            await convertToIco(options.icon, options.output, options.sizes);
+            console.log(`✓ Image converted to ICO: ${options.output}`);
 
         } else if (options.command === 'set') {
+            if (options.overlay) {
+                if ((!options.icon && !options.text) || (!options.folder && !options.output)) {
+                    console.error('❌ Overlay mode requires --icon or --text, and either --folder or --output');
+                    console.log('💡 Example: seticon set -f "./MyFolder" -i "logo.png" --overlay --os mac --variant blue');
+                    console.log('💡 Example: seticon set -f "./MyFolder" --text "DEV" --overlay --variant blue');
+                    process.exit(1);
+                }
+
+                const success = await processOverlayIcon({
+                    folder: options.folder,
+                    output: options.output,
+                    image: options.icon,
+                    text: options.text,
+                    textColor: options.textColor,
+                    os: options.os,
+                    variant: options.variant,
+                    iconColor: options.iconColor,
+                    zoom: options.zoom,
+                    sizes: options.sizes
+                });
+                process.exit(success ? 0 : 1);
+            }
+
             if (!options.folder || !options.icon) {
                 console.error('❌ Set command requires --folder and --icon parameters');
                 console.log('💡 Example: seticon set -f "./MyFolder" -i "icon.png"');

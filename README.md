@@ -8,6 +8,11 @@
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-F47C00?logo=contributorcovenant&logoColor=fff&labelColor=333&style=flat)](./.github/CODE_OF_CONDUCT.md)
 [![Downloads](https://img.shields.io/npm/dy/seticon-cli?logo=npm&logoColor=CB3837&label=Downloads&labelColor=333&color=CB3837&style=flat)](https://www.npmjs.com/package/seticon-cli)
 
+[![sharp](https://img.shields.io/npm/v/sharp?logo=npm&logoColor=fff&label=sharp&labelColor=333&color=CB3837&style=flat)](https://www.npmjs.com/package/sharp)
+[![png-to-ico](https://img.shields.io/npm/v/png-to-ico?logo=npm&logoColor=fff&label=png-to-ico&labelColor=333&color=CB3837&style=flat)](https://www.npmjs.com/package/png-to-ico)
+[![decode-bmp](https://img.shields.io/npm/v/decode-bmp?logo=npm&logoColor=fff&label=decode-bmp&labelColor=333&color=CB3837&style=flat)](https://www.npmjs.com/package/decode-bmp)
+[![ico-extract](https://img.shields.io/npm/v/ico-extract?logo=npm&logoColor=fff&label=ico-extract&labelColor=333&color=CB3837&style=flat)](https://www.npmjs.com/package/ico-extract)
+
 [![Stars](https://img.shields.io/github/stars/goddivor/seticon-cli?logo=github&logoColor=fff&label=Stars&labelColor=333&color=E3B341&style=flat)](https://github.com/goddivor/seticon-cli/stargazers)
 [![Forks](https://img.shields.io/github/forks/goddivor/seticon-cli?logo=github&logoColor=fff&label=Forks&labelColor=333&color=8957E5&style=flat)](https://github.com/goddivor/seticon-cli/network/members)
 [![Watchers](https://img.shields.io/github/watchers/goddivor/seticon-cli?logo=github&logoColor=fff&label=Watchers&labelColor=333&color=1F6FEB&style=flat)](https://github.com/goddivor/seticon-cli/watchers)
@@ -16,17 +21,20 @@
 
 Cross-platform CLI to change folder icons on **Windows**, **macOS** and **Linux**.
 
-Automatically converts PNG icons to multi-size ICO on Windows, and uses the
-right mechanism for each desktop environment elsewhere.
+Accepts common image formats and automatically converts them to a multi-size
+ICO, then applies the icon using the right mechanism for each desktop environment.
 
 </div>
 
 ## 🎖️ Features
 
 - **Cross-platform** — Windows, macOS, Linux (GNOME and KDE)
-- **PNG → ICO conversion** built in (multi-size: 16, 32, 48, 64, 128, 256)
+- **Many input formats** — `ico`, `png`, `jpg`, `jpeg`, `bmp`, `tif`, `tiff`, `webp`, `svg`
+- **Automatic ICO conversion** built in (multi-size: 16, 32, 48, 64, 128, 256); `png` and `ico` are used as-is
+- **Overlay mode** — lay your image (or text) over a real folder icon, with color variants and zoom
+- **Reset** — restore a folder's default icon with `seticon reset <folder>`
+- **Content-addressed icon cache** with deduplication (same image reused, never re-converted)
 - **No admin / sudo required** for the icon change itself
-- **Native icon format support** on macOS and Linux (PNG, JPG, SVG, ICO)
 - **Detects the OS** and applies the correct mechanism automatically:
   - Windows → `desktop.ini` + `attrib +H +S +R`
   - macOS   → `NSWorkspace.setIcon` via `osascript` (Finder)
@@ -68,21 +76,26 @@ pnpm add -g seticon-cli
 ## ⚙️ Usage
 
 ```bash
-# Set a folder icon (auto-converts PNG → ICO on Windows)
+# Set a folder icon (any image is auto-converted to ICO)
 seticon set -f "./MyFolder" -i "./icon.png"
+seticon set -f "./MyFolder" -i "./photo.webp"
 
 # Shorthand: positional arguments, no flags needed
 seticon "./MyFolder" "./icon.png"
-seticon convert "./image.png" "./icon.ico"
+seticon convert "./image.jpg" "./icon.ico"
 
 # Long options also work
-seticon set --folder "Documents" --icon "logo.ico"
+seticon set --folder "Documents" --icon "logo.svg"
 
-# Convert PNG to ICO without setting an icon
-seticon convert -i "./image.png" -o "./icon.ico"
+# Convert an image to ICO without setting an icon
+seticon convert -i "./image.bmp" -o "./icon.ico"
 
 # Pick specific sizes for the ICO output
 seticon convert --icon "photo.png" --output "icon.ico" --sizes 16,32,48
+
+# Reset a folder back to its default icon
+seticon reset "./MyFolder"
+seticon "./MyFolder" -r
 
 # Show the full manual
 seticon --help
@@ -92,13 +105,62 @@ seticon --lang fr
 seticon -l en
 ```
 
-### 🖼️ Supported icon formats per OS
+### 🎨 Overlay mode
 
-| OS      | Formats accepted               | Notes                                                |
-| ------- | ------------------------------ | ---------------------------------------------------- |
-| Windows | `.ico` (PNG auto-converted)    | `desktop.ini` written + folder marked system/hidden  |
-| macOS   | `.png` / `.jpg` / `.tiff` / `.icns` | Asks for Finder automation permission on first run |
-| Linux   | `.png` / `.jpg` / `.svg` / `.ico` | GNOME via `gio`, KDE via `.directory`              |
+Instead of using your image directly, lay it over a real folder icon. Add
+`--overlay` (`-ov`):
+
+```bash
+# Lay an image over your machine's folder icon, then apply it
+seticon set -f "./MyFolder" -i "./logo.png" --overlay
+
+# Color the folder and zoom the overlay (short aliases)
+seticon set -f "./Dev" -i "js.png" -ov -va blue -ic variant -z 125
+
+# Color it with a preset or a raw hex
+seticon set -f "./Photos" -i "cam.png" -ov -va "#e67e22"
+
+# Draw text on the folder instead of an image
+seticon set -f "./Work" --text "WORK" --overlay --variant blue
+seticon set -f "./Docs" -t "DOCS" -ov -va red -tc "#ffffff"
+
+# Force the macOS look (the only style you can force from any OS)
+seticon set -i "logo.svg" -o "icon.ico" --overlay --os mac --variant red
+```
+
+| Option | Alias | Values | Notes |
+| ------ | ----- | ------ | ----- |
+| `--overlay` | `-ov` | — | Enable overlay mode |
+| `--os` | `-os` | `mac` | Force the folder style. Only `mac` is allowed; otherwise the OS is auto-detected |
+| `--variant` | `-va` | mac: variant name · windows/linux: color preset or `#hex` | Folder color |
+| `--icon-color` | `-ic` | `original`, `variant` | Keep image colors or tint to folder |
+| `--text` | `-t` | any short text | Draw text instead of an image |
+| `--text-color` | `-tc` | `#hex` | Text color (default: the folder color) |
+| `--zoom` | `-z` | `75`, `92`, `100`, `108`, `125` | Overlay size |
+
+> Overlay accepts **either** an image (`-i`) **or** text (`--text`), not both.
+
+> 💡 Overlay mode is inspired by and credits
+> [**FolderArt** by christianvmm](https://github.com/christianvmm/folderart),
+> whose folder designs and approach this feature builds upon.
+
+### 🖼️ Supported formats
+
+| Input format                          | Behavior              |
+| ------------------------------------- | --------------------- |
+| `png`, `ico`                          | used as-is            |
+| `jpg`, `jpeg`, `bmp`, `tif`, `tiff`, `webp`, `svg` | auto-converted to a multi-size `ico` |
+
+Converted icons are stored once in a content-addressed cache and reused for
+identical images, so the same picture is never converted twice.
+
+### 🖥️ How the icon is applied per OS
+
+| OS      | Mechanism                                                            |
+| ------- | ------------------------------------------------------------------- |
+| Windows | `desktop.ini` (absolute `IconResource`) + `attrib +H +S +R`         |
+| macOS   | `NSWorkspace.setIcon` via `osascript` (Finder permission on 1st run) |
+| Linux   | `gio set metadata::custom-icon` (GNOME) + `.directory` file (KDE)    |
 
 ## 🤝 Contributing
 

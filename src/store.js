@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { getConfigPath } from './config.js';
 import { sha256Hex, ed2kHex } from './hash.js';
-import { convertPngToIco } from './convert.js';
+import { convertToIco } from './convert.js';
 
 export function getStoreDir() {
     return path.join(path.dirname(getConfigPath()), 'icons');
@@ -45,8 +45,8 @@ export async function resolveStoredIcon(sourcePath, needsConversion, sizes) {
     if (fs.existsSync(storePath)) {
         console.log(`♻️  Reusing cached icon (${storeId.slice(0, 12)}…)`);
     } else if (needsConversion) {
-        console.log('📸 PNG detected, converting to ICO...');
-        await convertPngToIco(absSource, storePath, sizes);
+        console.log(`📸 Converting ${path.extname(absSource)} to ICO...`);
+        await convertToIco(absSource, storePath, sizes);
         console.log('✓ Converted and stored in the icon cache');
     } else {
         fs.copyFileSync(absSource, storePath);
@@ -82,6 +82,22 @@ export function trackUsage(storeId, folderAbs) {
             index[storeId].usedBy.push(folderAbs);
             saveIndex(index);
         }
+    } catch {
+    }
+}
+
+// Remove a folder from every icon's usedBy list (used by reset).
+export function untrackUsage(folderAbs) {
+    try {
+        const index = loadIndex();
+        let changed = false;
+        for (const id of Object.keys(index)) {
+            if (Array.isArray(index[id].usedBy) && index[id].usedBy.includes(folderAbs)) {
+                index[id].usedBy = index[id].usedBy.filter(f => f !== folderAbs);
+                changed = true;
+            }
+        }
+        if (changed) saveIndex(index);
     } catch {
     }
 }
