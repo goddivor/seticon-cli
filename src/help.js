@@ -30,9 +30,11 @@ ${'='.repeat(34)}
 
 🖼️  OVERLAY OPTIONS (lay the image over a folder base):
    -ov, --overlay          Compose the image onto a folder instead of using it directly
-   -os, --os <name>        Folder style: mac, windows, linux (default: current OS)
-   -va, --variant <name|hex>  Folder color. mac/windows: a preset variant name;
-                           linux: a color preset (blue, green, red, ...) or #hex
+   -os, --os <name>        Force the folder style (only "mac" is allowed). By
+                           default the OS is auto-detected: Windows and Linux use
+                           the machine's own folder icon.
+   -va, --variant <name|hex>  Folder color. mac: a preset variant name (green,
+                           red, ...); windows/linux: a color preset or #hex
    -ic, --icon-color <mode>   original (keep image colors) or variant (tint to folder)
    -t,  --text <text>      Draw text on the folder instead of an image
    -tc, --text-color <hex>    Text color (default: the folder color)
@@ -126,9 +128,11 @@ ${'='.repeat(34)}
 
 🖼️  OPTIONS OVERLAY (poser l'image sur un dossier) :
    -ov, --overlay          Composer l'image sur un dossier au lieu de l'utiliser telle quelle
-   -os, --os <nom>         Style de dossier : mac, windows, linux (défaut : OS courant)
-   -va, --variant <nom|hex>   Couleur du dossier. mac/windows : un nom de variante ;
-                           linux : un preset (blue, green, red, ...) ou #hex
+   -os, --os <nom>         Forcer le style de dossier (seul "mac" est autorisé). Par
+                           défaut l'OS est auto-détecté : Windows et Linux utilisent
+                           l'icône de dossier de la machine.
+   -va, --variant <nom|hex>   Couleur du dossier. mac : un nom de variante (green,
+                           red, ...) ; windows/linux : un preset ou #hex
    -ic, --icon-color <mode>   original (garder les couleurs) ou variant (teinter au dossier)
    -t,  --text <texte>     Écrire du texte sur le dossier au lieu d'une image
    -tc, --text-color <hex>    Couleur du texte (défaut : la couleur du dossier)

@@ -101,28 +101,28 @@ Instead of using your image directly, lay it over a real folder icon (à la
 FolderArt). Add `--overlay` (`-ov`):
 
 ```bash
-# Lay an image over the current OS folder, then apply it
+# Lay an image over your machine's folder icon, then apply it
 seticon set -f "./MyFolder" -i "./logo.png" --overlay
 
-# Pick the folder style and color, save to a file
-seticon set -i "logo.svg" -o "icon.ico" --overlay --os mac --variant red
-
-# Tint the overlay to match the folder color, and zoom it (short aliases)
+# Color the folder and zoom the overlay (short aliases)
 seticon set -f "./Dev" -i "js.png" -ov -va blue -ic variant -z 125
 
-# Linux uses your current icon theme; color it with a preset or a hex
+# Color it with a preset or a raw hex
 seticon set -f "./Photos" -i "cam.png" -ov -va "#e67e22"
 
 # Draw text on the folder instead of an image
 seticon set -f "./Work" --text "WORK" --overlay --variant blue
 seticon set -f "./Docs" -t "DOCS" -ov -va red -tc "#ffffff"
+
+# Force the macOS look (the only style you can force from any OS)
+seticon set -i "logo.svg" -o "icon.ico" --overlay --os mac --variant red
 ```
 
 | Option | Alias | Values | Notes |
 | ------ | ----- | ------ | ----- |
 | `--overlay` | `-ov` | — | Enable overlay mode |
-| `--os` | `-os` | `mac`, `windows`, `linux` | Folder style (default: current OS) |
-| `--variant` | `-va` | mac/windows: variant name · linux: color preset or `#hex` | Folder color |
+| `--os` | `-os` | `mac` | Force the folder style. Only `mac` is allowed; otherwise the OS is auto-detected |
+| `--variant` | `-va` | mac: variant name · windows/linux: color preset or `#hex` | Folder color |
 | `--icon-color` | `-ic` | `original`, `variant` | Keep image colors or tint to folder |
 | `--text` | `-t` | any short text | Draw text instead of an image |
 | `--text-color` | `-tc` | `#hex` | Text color (default: the folder color) |
@@ -130,9 +130,12 @@ seticon set -f "./Docs" -t "DOCS" -ov -va red -tc "#ffffff"
 
 > Overlay accepts **either** an image (`-i`) **or** text (`--text`), not both.
 
-> On **Linux**, the base folder is read from your current icon theme (Adwaita,
-> Yaru, Breeze…) — nothing is bundled. On **macOS/Windows**, bundled folder
-> looks are used.
+> **Where the base folder comes from:**
+> - **Windows**: the OS native folder icon, read from `imageres.dll.mun` /
+>   `shell32.dll` (cached after the first run). Nothing is bundled.
+> - **Linux**: your current icon theme (Adwaita, Yaru, Breeze…). Nothing is bundled.
+> - **macOS**: bundled FolderArt looks. `--os mac` is the only style you can force
+>   from another OS.
 
 > 💡 Overlay mode is inspired by and credits
 > [**FolderArt** by christianvmm](https://github.com/christianvmm/folderart),
