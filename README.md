@@ -130,13 +130,6 @@ seticon set -i "logo.svg" -o "icon.ico" --overlay --os mac --variant red
 
 > Overlay accepts **either** an image (`-i`) **or** text (`--text`), not both.
 
-> **Where the base folder comes from:**
-> - **Windows**: the OS native folder icon, read from `imageres.dll.mun` /
->   `shell32.dll` (cached after the first run). Nothing is bundled.
-> - **Linux**: your current icon theme (Adwaita, Yaru, Breeze…). Nothing is bundled.
-> - **macOS**: bundled FolderArt looks. `--os mac` is the only style you can force
->   from another OS.
-
 > 💡 Overlay mode is inspired by and credits
 > [**FolderArt** by christianvmm](https://github.com/christianvmm/folderart),
 > whose folder designs and approach this feature builds upon.
