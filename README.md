@@ -97,8 +97,8 @@ seticon -l en
 
 ### 🎨 Overlay mode
 
-Instead of using your image directly, lay it over a real folder icon (à la
-FolderArt). Add `--overlay` (`-ov`):
+Instead of using your image directly, lay it over a real folder icon. Add
+`--overlay` (`-ov`):
 
 ```bash
 # Lay an image over your machine's folder icon, then apply it
