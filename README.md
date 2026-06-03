@@ -171,3 +171,13 @@ and follow our [code of conduct](./.github/CODE_OF_CONDUCT.md) before getting st
 ## 📜 License
 
 Licensed under MIT License and copyrights reserved.
+
+## Star History
+
+<a href="https://www.star-history.com/?repos=goddivor%2Fseticon-cli&type=date&legend=top-left">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=goddivor/seticon-cli&type=date&theme=dark&legend=top-left" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=goddivor/seticon-cli&type=date&legend=top-left" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=goddivor/seticon-cli&type=date&legend=top-left" />
+ </picture>
+</a>
