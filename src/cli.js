@@ -25,6 +25,7 @@ export function parseArguments(args) {
         text: null,
         textColor: null,
         reset: false,
+        positionals: [],
         unknownOption: false
     };
 
@@ -134,21 +135,11 @@ export function parseArguments(args) {
                     options.unknownOption = true;
                     break;
                 }
-                // Positional after `reset` is the target folder.
-                if (options.command === 'reset') {
-                    if (!options.folder) options.folder = arg;
-                    break;
-                }
-                // Positional shorthand: `seticon "./folder" ["./icon"]`.
-                // Only consume the next token as the icon when it is not a flag.
-                if (!options.command) {
-                    options.command = 'set';
-                    options.folder = arg;
-                    if (nextArg && !nextArg.startsWith('-')) {
-                        options.icon = nextArg;
-                        i++;
-                    }
-                }
+                // Collect every positional argument. Their meaning (folder(s)
+                // and/or icon) is resolved at execution time, since -r/--reset
+                // may appear after the folders (e.g. `seticon A B -r`).
+                if (!options.command) options.command = 'set';
+                options.positionals.push(arg);
                 break;
         }
     }
@@ -191,26 +182,40 @@ export async function main() {
         process.exit(1);
     }
 
+    const isReset = options.command === 'reset' || options.reset;
+
+    // Resolve positional arguments by command.
+    if (isReset) {
+        // Every positional is a target folder (plus -f if given).
+        options.folders = [...options.positionals];
+        if (options.folder) options.folders.unshift(options.folder);
+    } else if (options.command === 'set') {
+        // First positional is the folder, second is the icon (shorthand).
+        if (!options.folder && options.positionals[0]) options.folder = options.positionals[0];
+        if (!options.icon && options.positionals[1]) options.icon = options.positionals[1];
+    } else if (options.command === 'convert') {
+        if (!options.icon && options.positionals[0]) options.icon = options.positionals[0];
+        if (!options.output && options.positionals[1]) options.output = options.positionals[1];
+    }
+
     try {
-        // Reset: `seticon reset <folder>`, or `-r/--reset` with a folder.
-        if (options.command === 'reset' || options.reset) {
-            const folder = options.folder || options.icon;
-            if (!folder) {
-                console.error('❌ Reset requires a folder');
-                console.log('💡 Example: seticon reset -f "./MyFolder"  (or: seticon "./MyFolder" -r)');
+        // Reset: `seticon reset <folder...>`, or one/many folders with -r/--reset.
+        if (isReset) {
+            const folders = options.folders.filter(Boolean);
+            if (folders.length === 0) {
+                console.error('❌ Reset requires at least one folder');
+                console.log('💡 Example: seticon reset "./A" "./B"   (or: seticon "./A" -r)');
                 process.exit(1);
             }
-            const ok = await resetFolderIcon(folder);
-            process.exit(ok ? 0 : 1);
+            let allOk = true;
+            for (const folder of folders) {
+                const ok = await resetFolderIcon(folder);
+                if (!ok) allOk = false;
+            }
+            process.exit(allOk ? 0 : 1);
         }
 
         if (options.command === 'convert') {
-            if (args[0] === 'convert' && args.length === 3) {
-                const [, imagePath, icoPath] = args;
-                options.icon = imagePath;
-                options.output = icoPath;
-            }
-
             if (!options.icon || !options.output) {
                 console.error('❌ Convert command requires --icon and --output parameters');
                 console.log('💡 Example: seticon convert -i "image.jpg" -o "icon.ico"');
