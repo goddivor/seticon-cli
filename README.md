@@ -26,13 +26,23 @@ ICO, then applies the icon using the right mechanism for each desktop environmen
 
 </div>
 
+## ✨ Star History
+
+<a href="https://www.star-history.com/?repos=goddivor%2Fseticon-cli&type=date&legend=top-left">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=goddivor/seticon-cli&type=date&theme=dark&legend=top-left" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=goddivor/seticon-cli&type=date&legend=top-left" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=goddivor/seticon-cli&type=date&legend=top-left" />
+ </picture>
+</a>
+
 ## 🎖️ Features
 
 - **Cross-platform** — Windows, macOS, Linux (GNOME and KDE)
 - **Many input formats** — `ico`, `png`, `jpg`, `jpeg`, `bmp`, `tif`, `tiff`, `webp`, `svg`
 - **Automatic ICO conversion** built in (multi-size: 16, 32, 48, 64, 128, 256); `png` and `ico` are used as-is
 - **Overlay mode** — lay your image (or text) over a real folder icon, with color variants and zoom
-- **Reset** — restore a folder's default icon with `seticon reset <folder>`
+- **Reset** — restore the default icon of one or more folders with `seticon reset <folders...>`
 - **Content-addressed icon cache** with deduplication (same image reused, never re-converted)
 - **No admin / sudo required** for the icon change itself
 - **Detects the OS** and applies the correct mechanism automatically:
@@ -93,9 +103,10 @@ seticon convert -i "./image.bmp" -o "./icon.ico"
 # Pick specific sizes for the ICO output
 seticon convert --icon "photo.png" --output "icon.ico" --sizes 16,32,48
 
-# Reset a folder back to its default icon
+# Reset folder(s) back to their default icon (one or more)
 seticon reset "./MyFolder"
-seticon "./MyFolder" -r
+seticon reset "./A" "./B" "./C"
+seticon "./A" "./B" -r
 
 # Show the full manual
 seticon --help
