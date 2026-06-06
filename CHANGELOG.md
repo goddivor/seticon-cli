@@ -5,6 +5,14 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0](https://github.com/goddivor/seticon-cli/compare/v1.2.0...v1.3.0) (2026-06-06)
+
+
+### Features
+
+* **reset:** support multiple folders (closes [#15](https://github.com/goddivor/seticon-cli/issues/15)) ([9143842](https://github.com/goddivor/seticon-cli/commit/91438424805083ed377d5352e7c6885689330e9c))
+* **reset:** support multiple folders (closes [#15](https://github.com/goddivor/seticon-cli/issues/15)) ([304bc5f](https://github.com/goddivor/seticon-cli/commit/304bc5fd6f3570f7951afe79b73abba92ae584c4))
+
 ## [1.2.0](https://github.com/goddivor/seticon-cli/compare/v1.1.0...v1.2.0) (2026-06-01)
 
 
